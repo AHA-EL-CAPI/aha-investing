@@ -22,6 +22,7 @@ const lastData = stockData[stockData.length - 1];
 
 import { useEffect, useState } from 'react';
 
+type PricePoint = { date: string; close: number };
 
 export default function Page() {
   const [priceData, setPriceData] = useState<PricePoint[]>([]);
