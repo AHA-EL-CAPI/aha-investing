@@ -88,13 +88,8 @@ export const ChartCard = ({
         <Bar dataKey={dataKey} name={title} radius={[4, 4, 0, 0]}>
           {stockData.map((entry, index) => {
             const rawValue = entry[dataKey];
-
-            const fill =
-              typeof rawValue === 'number'
-                ? rawValue >= 0
-                  ? '#22c55e'
-                  : '#ef4444'
-                : '#d1d5db'; // gris si no es número (opcional)
+            const value = typeof rawValue === 'number' ? rawValue : null;
+            const fill = value !== null && value >= 0 ? '#22c55e' : '#ef4444';
 
             return <Cell key={`cell-${index}`} fill={fill} />;
           })}
