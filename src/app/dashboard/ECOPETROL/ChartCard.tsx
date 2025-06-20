@@ -84,7 +84,11 @@ export const ChartCard = ({
           {stockData.map((entry, index) => (
             <Cell
               key={`cell-${index}`}
-              fill={entry[dataKey] >= 0 ? '#22c55e' : '#ef4444'} // green/red
+              fill={
+                typeof entry[dataKey] === 'number' && entry[dataKey] >= 0
+                  ? '#22c55e'
+                  : '#ef4444'
+              } // green/red
             />
           ))}
         </Bar>
