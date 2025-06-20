@@ -81,16 +81,18 @@ export const ChartCard = ({
         />
         {/* <Legend /> */}
         <Bar dataKey={dataKey} name={title} radius={[4, 4, 0, 0]}>
-          {stockData.map((entry, index) => (
-            <Cell
-              key={`cell-${index}`}
-              fill={
-                typeof entry[dataKey] === 'number' && entry[dataKey] >= 0
-                  ? '#22c55e'
-                  : '#ef4444'
-              } // green/red
-            />
-          ))}
+          {stockData.map((entry, index) => {
+            const value = entry[dataKey];
+
+            const isPositive = typeof value === 'number' && value >= 0;
+
+            return (
+              <Cell
+                key={`cell-${index}`}
+                fill={isPositive ? '#22c55e' : '#ef4444'}
+              />
+            );
+          })}
         </Bar>
       </BarChart>
     </ResponsiveContainer>
