@@ -183,7 +183,7 @@ export function PriceChart({ priceData }: { priceData: PricePoint[] }) {
   );
 }
 
-export default function Dashboard() {
+export default function Page() {
   const [priceData, setPriceData] = useState<PricePoint[]>([]);
 
   useEffect(() => {
