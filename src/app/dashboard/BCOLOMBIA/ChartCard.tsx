@@ -82,16 +82,16 @@ export const ChartCard = ({
         {/* <Legend /> */}
         <Bar dataKey={dataKey} name={title} radius={[4, 4, 0, 0]}>
           {stockData.map((entry, index) => {
-            const value = entry[dataKey];
+            const rawValue = entry[dataKey];
 
-            const isPositive = typeof value === 'number' && value >= 0;
+            const fill =
+              typeof rawValue === 'number'
+                ? rawValue >= 0
+                  ? '#22c55e'
+                  : '#ef4444'
+                : '#d1d5db'; // gris si no es número (opcional)
 
-            return (
-              <Cell
-                key={`cell-${index}`}
-                fill={isPositive ? '#22c55e' : '#ef4444'}
-              />
-            );
+            return <Cell key={`cell-${index}`} fill={fill} />;
           })}
         </Bar>
       </BarChart>
