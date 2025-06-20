@@ -16,7 +16,7 @@ export async function GET() {
       try {
         const result = JSON.parse(stdout);
         return resolve(NextResponse.json(result));
-      } catch (e) {
+      } catch (_e) {
         return resolve(NextResponse.json({ error: 'Invalid JSON output' }, { status: 500 }));
       }
     });

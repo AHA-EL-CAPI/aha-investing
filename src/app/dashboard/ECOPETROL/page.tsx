@@ -10,7 +10,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
   Cell,
 } from 'recharts';
 
@@ -24,9 +23,9 @@ import { valuationTable } from '@/data/ECOPETROL/ValuationData';
 const formatMillions = (value: number) =>
   `${(value / 1_000).toFixed(1)}`;
 
-const formatROETooltip = (value: number, name: string): [string, string] => {
-  return [`${value.toFixed(2)}%`, name];
-};
+// const formatROETooltip = (value: number, name: string): [string, string] => {
+//   return [`${value.toFixed(2)}%`, name];
+// };
 
 const lastData = stockData[stockData.length - 1];
 
