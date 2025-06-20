@@ -170,7 +170,7 @@ export default function Page() {
             <h3 className="text-lg font-semibold mb-2">Supuestos:</h3>
             <ul className="list-disc pl-6">
               {Object.entries(valuationTable.quantities).map(([key, value]) => {
-                let formattedValue = value;
+                let formattedValue: string;
 
                 if (key === "Initial FCF") {
                   formattedValue = `COP $ ${new Intl.NumberFormat('de-DE', {
@@ -179,6 +179,8 @@ export default function Page() {
                   }).format(value as number)}`;
                 } else if (key === "Disccount Rate" || key === "Margin of safety") {
                   formattedValue = `${value}%`;
+                } else {
+                  formattedValue = String(value);
                 }
 
                 return (
