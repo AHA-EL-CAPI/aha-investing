@@ -39,6 +39,12 @@ export default function Home() {
           >
             Ver Dashboard Ecopetrol
           </a>
+          <a
+            href="/dashboard/BABA"
+            className="inline-block w-full px-6 py-3 text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition"
+          >
+            Ver Dashboard Alibaba
+          </a>
 
           <div className="mt-[30px] flex justify-center">
             <div className="relative w-full max-w-[1280px]">

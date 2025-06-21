@@ -1,12 +1,22 @@
 import subprocess
 import datetime
+import os
 
-# Step 1: Run your update scripts
-companies = ["BCOLOMBIA", "ECOPETROL", "PFDAVVNDA"]
+script_folder = "src/scripts"
+this_script_prefix = "update"
 
+# Step 0: Detect all relevant scripts
+companies = []
+
+for filename in os.listdir(script_folder):
+    if filename.endswith("-price-history.py") and not filename.startswith(this_script_prefix):
+        company = filename.split("-")[0]  # Extract the company name before the first dash
+        companies.append(company)
+
+# Step 1: Run update scripts
 for company in companies:
     print(f"Updating {company}...")
-    result = subprocess.run(["python", f"src/scripts/{company}-price-history.py"])
+    result = subprocess.run(["python", f"{script_folder}/{company}-price-history.py"])
     if result.returncode != 0:
         print(f"❌ Error updating {company}")
         exit(1)
