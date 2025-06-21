@@ -1,4 +1,12 @@
 export default function Home() {
+  const companies = [
+    { name: "Alibaba", symbol: "BABA", image: "/logos/baba.png", addStroke: false },
+    { name: "Bancolombia", symbol: "BCOLOMBIA", image: "/logos/bcolombia.png", addStroke: true },
+    { name: "Ecopetrol", symbol: "ECOPETROL", image: "/logos/ecopetrol.png", addStroke: false },
+    { name: "Nubank", symbol: "NU", image: "/logos/nu.png", addStroke: false },
+    { name: "Davivienda", symbol: "PFDAVVNDA", image: "/logos/davivienda.png", addStroke: true }
+  ];
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-6 text-center">
       <div className="max-w-9xl">
@@ -8,78 +16,72 @@ export default function Home() {
         >
           AHA Investing
         </h1>
-        <p  className="text-gray-600 mb-6"
-          style={{ fontSize: 'clamp(1rem, 3vw, 2.5rem)' }}
-        >
+        <p className="text-gray-600 mb-10"
+           style={{ fontSize: 'clamp(1rem, 3vw, 2.5rem)' }}>
           Bienvenido a la fuente más accesible y gratuita para análisis fundamentales de acciones colombianas e internacionales. Aquí encontrarás métricas clave como ingresos, utilidad neta, FCF y más.
         </p>
 
-        <div className="space-y-4">
-          <a
-            href="/dashboard/BCOLOMBIA"
-            className="inline-block w-full px-6 py-3 text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition"
-          >
-            Ver Dashboard Bancolombia
-          </a>
-          <a
-            href="/dashboard/PFDAVVNDA"
-            className="inline-block w-full px-6 py-3 text-white bg-green-600 rounded-xl hover:bg-green-700 transition"
-          >
-            Ver Dashboard Davivienda
-          </a>
-          <a
-            href="/dashboard/NU"
-            className="inline-block w-full px-6 py-3 text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition"
-          >
-            Ver Dashboard Nubank
-          </a>
-          <a
-            href="/dashboard/ECOPETROL"
-            className="inline-block w-full px-6 py-3 text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition"
-          >
-            Ver Dashboard Ecopetrol
-          </a>
-          <a
-            href="/dashboard/BABA"
-            className="inline-block w-full px-6 py-3 text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition"
-          >
-            Ver Dashboard Alibaba
-          </a>
+        {/* DASHBOARDS TITLE */}
+        <h2 className="text-3xl font-bold mb-6 text-black dark:text-white">Dashboards</h2>
 
-          <div className="mt-[30px] flex justify-center">
-            <div className="relative w-full max-w-[1280px]">
-              {/* Main image */}
+        {/* DASHBOARDS GRID */}
+        <div className="w-full max-w-screen-xl mx-auto px-4">
+          <div className="grid grid-cols-5 sm:grid-cols-5 md:grid-cols-5 lg:grid-cols-5 gap-6 justify-items-center">
+            {companies.map(({ name, symbol, image, addStroke }) => (
+              <a key={symbol} href={`/dashboard/${symbol}`} className="group w-full flex flex-col items-center">
+                <div className="w-full max-w-[180px] max-h-[180px] overflow-hidden flex items-center justify-center">
+                  <img
+                    src={image}
+                    alt={`Dashboard ${name}`}
+                    className={`w-full h-full object-contain transition-transform duration-300 group-hover:scale-105 ${
+                      addStroke ? 'drop-shadow-[0_0_2px_white] drop-shadow-[0_0_2px_white]' : ''
+                    }`}
+                  />
+                </div>
+                <p className="mt-2 text-center text-lg font-medium text-black dark:text-white group-hover:underline">
+                  {name}
+                </p>
+              </a>
+            ))}
+
+            {/* Fill empty grid cells to complete the row visually */}
+            {Array.from({ length: (5 - companies.length % 5) % 5 }).map((_, i) => (
+              <div key={`empty-${i}`} className="w-full h-[180px] opacity-0" />
+            ))}
+          </div>
+        </div>
+
+        {/* MAIN YOUTUBE IMAGE AND LINK */}
+        <div className="mt-[30px] flex justify-center">
+          <div className="relative w-full max-w-[1280px]">
+            <img
+              src="/me.png"
+              alt="Alejandro señalando el canal de YouTube"
+              className="w-full h-auto"
+            />
+
+            <a
+              href="https://www.youtube.com/@ahainvesting"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute animate-bounce transition-transform hover:scale-110"
+              style={{
+                top: '-5%',
+                left: '65%',
+                width: '30%',
+                transform: 'translate(-0%, -0%)',
+              }}
+            >
               <img
-                src="/me.png"
-                alt="Alejandro señalando el canal de YouTube"
+                src="/youtube logo alone.png"
+                alt="YouTube"
                 className="w-full h-auto"
               />
-
-              {/* YouTube Logo */}
-              <a
-                href="https://www.youtube.com/@ahainvesting"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute animate-bounce transition-transform hover:scale-110"
-                style={{
-                  top: '-5%',       // Adjust relative to the image's height
-                  left: '65%',      // Adjust relative to the image's width
-                  width: '30%',     // Responsive width relative to image
-                  transform: 'translate(-0%, -0%)',
-                }}
-              >
-                <img
-                  src="/youtube logo alone.png"
-                  alt="YouTube"
-                  className="w-full h-auto"
-                />
-                <span className="block text-red-600 font-bold text-xs md:text-sm text-center mt-1 animate-pulse">
-                  ¡Haz clic aquí!
-                </span>
-              </a>
-            </div>
+              <span className="block text-red-600 font-bold text-xs md:text-sm text-center mt-1 animate-pulse">
+                ¡Haz clic aquí!
+              </span>
+            </a>
           </div>
-
         </div>
       </div>
     </main>

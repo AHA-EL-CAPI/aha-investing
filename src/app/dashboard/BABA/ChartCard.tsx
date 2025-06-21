@@ -25,7 +25,7 @@ export const ChartCard = ({
   title: string;
   dataKey: keyof typeof stockData[0];
   tickFormatter?: (value: number) => string;
-  tooltipFormatter?: (value: number, name: string) => [string, string];
+  // tooltipFormatter?: (value: number, name: string) => [string, string];
   yLabel?: string;
 }) => (
   <div className="bg-white dark:bg-black p-4 rounded-2xl shadow mb-6 w-full">
@@ -62,13 +62,21 @@ export const ChartCard = ({
           tickFormatter={tickFormatter}
         />
         <Tooltip
-          formatter={
-            tooltipFormatter ??
-            ((value: number, name: string) => {
-              const formatted = `${value.toFixed(2)}%`;
-              return [formatted, name];
-            })
-          }
+          formatter={(value, name) => {
+            const lowerName = name.toLowerCase();
+
+            if (lowerName.includes("roe") || lowerName.includes("%")) {
+              return [`${(value * 100).toFixed(2)}%`, name];
+            }
+
+            return [
+              `USD $${value.toLocaleString('es-CO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              })}B`,
+              name
+            ];
+          }}
           labelFormatter={(label) => `Trimestre: ${label}`}
           contentStyle={{
             backgroundColor: '#111', // Tooltip background
