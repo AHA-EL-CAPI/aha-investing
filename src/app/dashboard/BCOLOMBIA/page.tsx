@@ -25,6 +25,8 @@ import { priceHistory } from '@/data/BCOLOMBIA/price-history'; // adjust path as
 
 type PricePoint = { date: string; close: number };
 
+import YouTubeBanner from "@/components/YouTubeBanner";
+
 export default function Page() {
   const [priceData, setPriceData] = useState<PricePoint[]>([]);
 
@@ -46,7 +48,9 @@ export default function Page() {
 
   return (
     <main className="p-6 bg-gray-50 dark:bg-neutral-900 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-black dark:text-white">
+      <YouTubeBanner />
+      
+      <h1 className="text-3xl font-bold mb-6 text-black dark:text-white text-center">
         Principales Métricas de Bancolombia
       </h1>
 
