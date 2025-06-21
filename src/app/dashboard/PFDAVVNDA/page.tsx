@@ -21,6 +21,7 @@ const lastData = stockData[stockData.length - 1];
 
 
 import { useEffect, useState } from 'react';
+import { priceHistory } from '@/data/BCOLOMBIA/price-history'; // adjust path as needed
 
 type PricePoint = { date: string; close: number };
 
@@ -28,9 +29,10 @@ export default function Page() {
   const [priceData, setPriceData] = useState<PricePoint[]>([]);
 
   useEffect(() => {
-    fetch('/api/history/PFDAVVNDA')
-      .then((res) => res.json())
-      .then((data) => setPriceData(data));
+    // fetch('/api/history/BCOLOMBIA')
+    //   .then((res) => res.json())
+    //   .then((data) => setPriceData(data));
+    setPriceData(priceHistory);
   }, []);
 
   const lastPrice = priceData.at(-1)?.close ?? null;
