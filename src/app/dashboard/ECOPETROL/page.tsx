@@ -21,7 +21,7 @@ const lastData = stockData[stockData.length - 1];
 
 
 import { useEffect, useState } from 'react';
-import { priceHistory } from '@/data/BCOLOMBIA/price-history'; // adjust path as needed
+import { priceHistory } from '@/data/ECOPETROL/price-history'; // adjust path as needed
 
 type PricePoint = { date: string; close: number };
 
