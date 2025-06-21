@@ -3,7 +3,7 @@ module.exports = {
   darkMode: 'class',
   content: [
     // This is the most robust path for Next.js App Router projects
-    './src/app/dashboard/BCOLOMBIA/page.tsx',
+    // './src/app/dashboard/BCOLOMBIA/page.tsx',
     './app/**/*.{js,ts,jsx,tsx,mdx}', // Catches files in the root 'app' directory
     './src/**/*.{js,ts,jsx,tsx,mdx}', // Catches files in the 'src' directory (including 'src/app' if it's there)
     './components/**/*.{js,ts,jsx,tsx,mdx}', // If you have a top-level 'components' folder
