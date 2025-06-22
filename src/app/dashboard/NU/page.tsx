@@ -13,9 +13,9 @@ import { valuationTable } from '@/data/NU/ValuationData';
 const formatMillions = (value: number) =>
   `${(value / 1).toFixed(1)}`;
 
-const formatROETooltip = (value: number, name: string): [string, string] => {
-  return [`${value.toFixed(2)}%`, name];
-};
+// const formatROETooltip = (value: number, name: string): [string, string] => {
+//   return [`${value.toFixed(2)}%`, name];
+// };
 
 const lastData = stockData[stockData.length - 1];
 
@@ -58,7 +58,7 @@ export default function Page() {
         <ChartCard title="Net Interest Income" dataKey="Quarter_Revenue" tickFormatter={formatMillions} />
         <ChartCard title="Net Income" dataKey="Quarter_Profit" tickFormatter={formatMillions} />
         <ChartCard title="Equity" dataKey="Quarter_Equity" tickFormatter={formatMillions} />
-        <ChartCard title="ROE" dataKey="Quarter_ROE" yLabel="Porcentaje (%)" tooltipFormatter={formatROETooltip} />
+        <ChartCard title="ROE" dataKey="Quarter_ROE" yLabel="Porcentaje (%)" />
       </div>
 
       {/* Table for YoY Data */}

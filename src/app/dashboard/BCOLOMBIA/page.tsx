@@ -13,9 +13,9 @@ import { valuationTable } from '@/data/BCOLOMBIA/ValuationData';
 const formatMillions = (value: number) =>
   `${(value / 1_000_000).toFixed(1)}`;
 
-const formatROETooltip = (value: number, name: string): [string, string] => {
-  return [`${value.toFixed(2)}%`, name];
-};
+// const formatROETooltip = (value: number, name: string): [string, string] => {
+//   return [`${value.toFixed(2)}%`, name];
+// };
 
 const lastData = stockData[stockData.length - 1];
 
@@ -58,7 +58,7 @@ export default function Page() {
         <ChartCard title="Net Interest Income" dataKey="Net_Interest_Income" tickFormatter={formatMillions} />
         <ChartCard title="Net Income" dataKey="Net_Income" tickFormatter={formatMillions} />
         <ChartCard title="Equity" dataKey="Equity" tickFormatter={formatMillions} />
-        <ChartCard title="ROE" dataKey="ROE" yLabel="Porcentaje (%)" tooltipFormatter={formatROETooltip} />
+        <ChartCard title="ROE" dataKey="ROE" yLabel="Porcentaje (%)" />
       </div>
 
       {/* Table for YoY Data */}

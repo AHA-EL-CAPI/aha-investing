@@ -19,7 +19,6 @@ export const ChartCard = ({
   title,
   dataKey,
   tickFormatter,
-  tooltipFormatter,
   yLabel = 'Billones de USD $',
 }: {
   title: string;
@@ -66,14 +65,14 @@ export const ChartCard = ({
             const lowerName = name.toLowerCase();
 
             if (lowerName.includes("roe") || lowerName.includes("%")) {
-              return [`${(value * 100).toFixed(2)}%`, name];
+              return [`${(value * 1).toFixed(2)}%`, name];
             }
 
             return [
               `USD $${value.toLocaleString('es-CO', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-              })}B`,
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+              })} B`,
               name
             ];
           }}
