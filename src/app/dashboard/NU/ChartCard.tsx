@@ -15,9 +15,7 @@ import {
 
 import { stockData } from '@/data/NU/Data';
 
-import { createTooltipFormatter } from "@/utils/formatters";
-
-const tooltipFormatter = createTooltipFormatter("USD"); // or "COP"
+import { createTooltipFormatter } from '@/components/createTooltipFormatter';
 
 export const ChartCard = ({
   title,
@@ -64,18 +62,27 @@ export const ChartCard = ({
           }}
           tickFormatter={tickFormatter}
         />
+
         <Tooltip
-          formatter={tooltipFormatter}
+          formatter={createTooltipFormatter('USD')}
           labelFormatter={(label) => `Trimestre: ${label}`}
           contentStyle={{
-            backgroundColor: '#111', // Tooltip background
+            backgroundColor: '#111',
             border: '1px solid #888',
             color: 'white',
           }}
-          labelStyle={{ color: 'white', fontWeight: 'bold' }} // Quarter label
-          itemStyle={{ color: 'white' }} // Metric value (e.g. ROE)
-          wrapperStyle={{ zIndex: 1000 }} // Ensure it's not hidden behind other elements
+          labelStyle={{
+            color: 'white',
+            fontWeight: 'bold',
+          }}
+          itemStyle={{
+            color: 'white',
+          }}
+          wrapperStyle={{
+            zIndex: 1000,
+          }}
         />
+
         {/* <Legend /> */}
         <Bar dataKey={dataKey} name={title} radius={[4, 4, 0, 0]}>
           {stockData.map((entry, index) => {
