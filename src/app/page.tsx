@@ -1,12 +1,20 @@
 export default function Home() {
   const companies = [
-    { name: "AMD", symbol: "AMD", image: "/logos/amd.png", addStroke: false },
-    { name: "Alibaba", symbol: "BABA", image: "/logos/baba.png", addStroke: false },
-    { name: "Apple", symbol: "AAPL", image: "/logos/aapl.png", addStroke: false },
     { name: "Bancolombia", symbol: "BCOLOMBIA", image: "/logos/bcolombia.png", addStroke: true },
     { name: "Ecopetrol", symbol: "ECOPETROL", image: "/logos/ecopetrol.png", addStroke: false },
     { name: "Nubank", symbol: "NU", image: "/logos/nu.png", addStroke: false },
-    { name: "Davivienda", symbol: "PFDAVVNDA", image: "/logos/davivienda.png", addStroke: true }
+    { name: "Davivienda", symbol: "PFDAVVNDA", image: "/logos/davivienda.png", addStroke: true },
+    { name: "AMD", symbol: "AMD", image: "/logos/amd.png", addStroke: false },
+    { name: "Alibaba", symbol: "BABA", image: "/logos/baba.png", addStroke: false },
+    { name: "Apple", symbol: "AAPL", image: "/logos/aapl.png", addStroke: false },
+    { name: "Amazon", symbol: "AMZN", image: "/logos/amzn.png", addStroke: true },
+    { name: "Google", symbol: "GOOGL", image: "/logos/googl.png", addStroke: false },
+    { name: "Mercadolibre", symbol: "MELI", image: "/logos/meli.png", addStroke: false },
+    { name: "Meta", symbol: "META", image: "/logos/meta.png", addStroke: false },
+    { name: "Microsoft", symbol: "MSFT", image: "/logos/msft.png", addStroke: false },
+    { name: "Netflix", symbol: "NFLX", image: "/logos/nflx.png", addStroke: false },
+    { name: "Nvidia", symbol: "NVDA", image: "/logos/nvda.png", addStroke: false },
+    { name: "Tesla", symbol: "TSLA", image: "/logos/tsla.png", addStroke: false }
   ];
 
   return (
