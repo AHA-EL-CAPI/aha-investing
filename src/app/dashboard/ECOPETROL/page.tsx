@@ -7,7 +7,7 @@ import { stockData } from '@/data/ECOPETROL/Data';
 import { valuationTable } from '@/data/ECOPETROL/ValuationData';
 
 import { ChartCard } from '@/components/ChartCard';
-import { PriceChart } from './PriceChart';
+import { PriceChart } from '@/components/PriceChart';
 
 
 const formatMillions = (value: number) =>
@@ -207,7 +207,7 @@ export default function Page() {
           </div> */}
 
           {/* Price chart */}
-          <PriceChart priceData={priceData} />
+          <PriceChart priceData={priceData} companyName="ECOPETROL" />
 
           {/* Verdict (mejor ubicado y más grande) */}
           {<div

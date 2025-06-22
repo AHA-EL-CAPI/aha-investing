@@ -3,7 +3,7 @@
 // import TradingViewWidget from '@/components/TradingViewWidget';
 
 import { ChartCard } from '@/components/ChartCard';
-import { PriceChart } from './PriceChart';
+import { PriceChart } from '@/components/PriceChart';
 
 import { stockData } from '@/data/BABA/Data';
 
@@ -207,7 +207,7 @@ export default function Page() {
           </div> */}
 
           {/* Price chart */}
-          <PriceChart priceData={priceData} />
+          <PriceChart priceData={priceData} companyName="BABA" />
 
           {/* Verdict (mejor ubicado y más grande) */}
           {<div

@@ -10,15 +10,18 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-// import TradingViewWidget from '@/components/TradingViewWidget';
-
 type PricePoint = { date: string; close: number };
 
-export function PriceChart({ priceData }: { priceData: PricePoint[] }) {
+type PriceChartProps = {
+  priceData: PricePoint[];
+  companyName: string; // 👈 new prop
+};
+
+export function PriceChart({ priceData, companyName }: PriceChartProps) {
   return (
     <div className="bg-white dark:bg-black p-4 rounded-2xl shadow mb-12 w-full">
       <h2 className="text-xl font-bold mb-4 text-black dark:text-white text-center">
-        Precio Histórico (ECOPETROL)
+        Precio Histórico ({companyName})
       </h2>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart
@@ -42,7 +45,7 @@ export function PriceChart({ priceData }: { priceData: PricePoint[] }) {
               }).format(val)
             }
             label={{
-              value: 'COP $',
+              value: 'USD $',
               angle: -90,
               position: 'insideLeft',
               dx: -10,
@@ -51,7 +54,7 @@ export function PriceChart({ priceData }: { priceData: PricePoint[] }) {
           />
           <Tooltip
             formatter={(value: number) => [
-              `COP $ ${new Intl.NumberFormat('es-CO', {
+              `USD $ ${new Intl.NumberFormat('es-CO', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0,
               }).format(value)}`,
@@ -79,5 +82,3 @@ export function PriceChart({ priceData }: { priceData: PricePoint[] }) {
     </div>
   );
 }
-
-
