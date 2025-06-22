@@ -20,6 +20,7 @@ import { createTooltipFormatter } from '@/components/createTooltipFormatter';
 export const ChartCard = ({
   title,
   dataKey,
+  tickFormatter,
   yLabel = 'Billones de USD $',
 }: {
   title: string;
