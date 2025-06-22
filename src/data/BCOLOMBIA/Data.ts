@@ -1,5 +1,6 @@
-export interface QuarterlyData {
-  quarter: string;
+import { QuarterlyBase } from '@/types/QuarterlyBase';
+
+export interface QuarterlyData extends QuarterlyBase {
   Net_Interest_Income: number | null;
   Net_Income: number | null;
   Equity: number | null;
@@ -14,7 +15,7 @@ export interface QuarterlyData {
 
 export const stockData: QuarterlyData[] = [
   {
-    quarter: '1T15',
+    quarter: '1Q15',
     Net_Interest_Income: 1778118.000000,
     Net_Income: 631901.000000,
     Equity: 17158775.000000,
@@ -27,7 +28,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: null,
   },
   {
-    quarter: '2T15',
+    quarter: '2Q15',
     Net_Interest_Income: 1775075.000000,
     Net_Income: 694982.000000,
     Equity: 18085332.000000,
@@ -40,7 +41,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: null,
   },
   {
-    quarter: '3T15',
+    quarter: '3Q15',
     Net_Interest_Income: 1749643.000000,
     Net_Income: 541314.000000,
     Equity: 19310887.000000,
@@ -53,7 +54,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: null,
   },
   {
-    quarter: '4T15',
+    quarter: '4Q15',
     Net_Interest_Income: 1922958.000000,
     Net_Income: 656352.000000,
     Equity: 19279449.000000,
@@ -66,7 +67,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: null,
   },
   {
-    quarter: '1T16',
+    quarter: '1Q16',
     Net_Interest_Income: 2299499.000000,
     Net_Income: 397366.000000,
     Equity: 18684203.000000,
@@ -79,7 +80,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: null,
   },
   {
-    quarter: '2T16',
+    quarter: '2Q16',
     Net_Interest_Income: 2432417.000000,
     Net_Income: 733059.000000,
     Equity: 19337178.000000,
@@ -92,7 +93,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -2.225862,
   },
   {
-    quarter: '3T16',
+    quarter: '3Q16',
     Net_Interest_Income: 2500532.000000,
     Net_Income: 603924.000000,
     Equity: 19894820.000000,
@@ -105,7 +106,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 6.345789,
   },
   {
-    quarter: '4T16',
+    quarter: '4Q16',
     Net_Interest_Income: 2463257.000000,
     Net_Income: 1130979.000000,
     Equity: 21267583.000000,
@@ -118,7 +119,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 61.545761,
   },
   {
-    quarter: '1T17',
+    quarter: '1Q17',
     Net_Interest_Income: 2621306.000000,
     Net_Income: 608754.000000,
     Equity: 20866381.000000,
@@ -131,7 +132,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 38.034227,
   },
   {
-    quarter: '2T17',
+    quarter: '2Q17',
     Net_Interest_Income: 2633391.000000,
     Net_Income: 653539.000000,
     Equity: 21830982.000000,
@@ -144,7 +145,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -20.611168,
   },
   {
-    quarter: '3T17',
+    quarter: '3Q17',
     Net_Interest_Income: 2551995.000000,
     Net_Income: 450806.000000,
     Equity: 22116848.000000,
@@ -157,7 +158,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -33.363774,
   },
   {
-    quarter: '4T17',
+    quarter: '4Q17',
     Net_Interest_Income: 2656715.000000,
     Net_Income: 901901.000000,
     Equity: 23112964.000000,
@@ -170,7 +171,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -27.426133,
   },
   {
-    quarter: '1T18',
+    quarter: '1Q18',
     Net_Interest_Income: 2512755.000000,
     Net_Income: 521760.000000,
     Equity: 21952058.000000,
@@ -183,7 +184,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -19.865102,
   },
   {
-    quarter: '2T18',
+    quarter: '2Q18',
     Net_Interest_Income: 2546117.000000,
     Net_Income: 591716.000000,
     Equity: 22739386.000000,
@@ -196,7 +197,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -13.499529,
   },
   {
-    quarter: '3T18',
+    quarter: '3Q18',
     Net_Interest_Income: 2568375.000000,
     Net_Income: 543219.000000,
     Equity: 23151112.000000,
@@ -209,7 +210,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 15.398438,
   },
   {
-    quarter: '4T18',
+    quarter: '4Q18',
     Net_Interest_Income: 2819260.000000,
     Net_Income: 1002169.000000,
     Equity: 24848920.000000,
@@ -222,7 +223,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 4.704501,
   },
   {
-    quarter: '1T19',
+    quarter: '1Q19',
     Net_Interest_Income: 2687324.000000,
     Net_Income: 833328.000000,
     Equity: 24383380.000000,
@@ -235,7 +236,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 46.195719,
   },
   {
-    quarter: '2T19',
+    quarter: '2Q19',
     Net_Interest_Income: 2889306.000000,
     Net_Income: 936189.000000,
     Equity: 25394216.000000,
@@ -248,7 +249,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 42.049821,
   },
   {
-    quarter: '3T19',
+    quarter: '3Q19',
     Net_Interest_Income: 2781930.000000,
     Net_Income: 878581.000000,
     Equity: 26990351.000000,
@@ -261,7 +262,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 41.685781,
   },
   {
-    quarter: '4T19',
+    quarter: '4Q19',
     Net_Interest_Income: 2842330.000000,
     Net_Income: 469253.000000,
     Equity: 26883919.000000,
@@ -274,7 +275,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -58.281737,
   },
   {
-    quarter: '1T20',
+    quarter: '1Q20',
     Net_Interest_Income: 2912461.000000,
     Net_Income: 335884.000000,
     Equity: 27190051.000000,
@@ -287,7 +288,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -63.302607,
   },
   {
-    quarter: '2T20',
+    quarter: '2Q20',
     Net_Interest_Income: 2901349.000000,
     Net_Income: -73297.000000,
     Equity: 26472884.000000,
@@ -300,7 +301,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -107.262433,
   },
   {
-    quarter: '2T21',
+    quarter: '2Q21',
     Net_Interest_Income: 2845568.000000,
     Net_Income: 1156915.000000,
     Equity: 29004880.000000,
@@ -313,7 +314,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 24.338051,
   },
   {
-    quarter: '3T21',
+    quarter: '3Q21',
     Net_Interest_Income: 2905518.000000,
     Net_Income: 942620.000000,
     Equity: 30261139.000000,
@@ -326,7 +327,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 82.601876,
   },
   {
-    quarter: '4T21',
+    quarter: '4Q21',
     Net_Interest_Income: 3207746.000000,
     Net_Income: 1444744.000000,
     Equity: 32234347.000000,
@@ -339,7 +340,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 272.169851,
   },
   {
-    quarter: '1T22',
+    quarter: '1Q22',
     Net_Interest_Income: 3700331.000000,
     Net_Income: 1731858.000000,
     Equity: 30200262.000000,
@@ -352,7 +353,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -2130.837182,
   },
   {
-    quarter: '2T22',
+    quarter: '2Q22',
     Net_Interest_Income: 4314928.000000,
     Net_Income: 1779695.000000,
     Equity: 33281636.000000,
@@ -365,7 +366,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 34.435255,
   },
   {
-    quarter: '3T22',
+    quarter: '3Q22',
     Net_Interest_Income: 4984764.000000,
     Net_Income: 1629245.000000,
     Equity: 36522763.000000,
@@ -378,7 +379,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 46.748175,
   },
   {
-    quarter: '4T22',
+    quarter: '4Q22',
     Net_Interest_Income: 5354453.000000,
     Net_Income: 1642695.000000,
     Equity: 39088903.000000,
@@ -391,7 +392,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -6.022069,
   },
   {
-    quarter: '1T23',
+    quarter: '1Q23',
     Net_Interest_Income: 5357858.000000,
     Net_Income: 1716777.000000,
     Equity: 36917563.000000,
@@ -404,7 +405,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -18.571495,
   },
   {
-    quarter: '2T23',
+    quarter: '2Q23',
     Net_Interest_Income: 4933670.000000,
     Net_Income: 1460491.000000,
     Equity: 36542639.000000,
@@ -417,7 +418,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -29.082880,
   },
   {
-    quarter: '3T23',
+    quarter: '3Q23',
     Net_Interest_Income: 4851220.000000,
     Net_Income: 1491759.000000,
     Equity: 37533418.000000,
@@ -430,7 +431,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -13.718596,
   },
   {
-    quarter: '4T23',
+    quarter: '4Q23',
     Net_Interest_Income: 5235113.000000,
     Net_Income: 1447907.000000,
     Equity: 38089512.000000,
@@ -443,7 +444,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -11.870960,
   },
   {
-    quarter: '1T24',
+    quarter: '1Q24',
     Net_Interest_Income: 5158315.000000,
     Net_Income: 1663472.000000,
     Equity: 36485541.000000,
@@ -456,7 +457,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -1.245117,
   },
   {
-    quarter: '2T24',
+    quarter: '2Q24',
     Net_Interest_Income: 5186589.000000,
     Net_Income: 1439774.000000,
     Equity: 39219915.000000,
@@ -469,7 +470,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -4.342202,
   },
   {
-    quarter: '3T24',
+    quarter: '3Q24',
     Net_Interest_Income: 5152600.000000,
     Net_Income: 1501194.000000,
     Equity: 40899436.000000,
@@ -482,7 +483,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: -6.958096,
   },
   {
-    quarter: '4T24',
+    quarter: '4Q24',
     Net_Interest_Income: 5022806.000000,
     Net_Income: 1663304.000000,
     Equity: 43542468.000000,
@@ -495,7 +496,7 @@ export const stockData: QuarterlyData[] = [
     ROE_ΔYoY_Pct: 2.878932,
   },
   {
-    quarter: '1T25',
+    quarter: '1Q25',
     Net_Interest_Income: 5064000.000000,
     Net_Income: 1737664.000000,
     Equity: 40634426.000000,

@@ -1,5 +1,6 @@
-export interface QuarterlyData {
-  quarter: string;
+import { QuarterlyBase } from '@/types/QuarterlyBase';
+
+export interface QuarterlyData extends QuarterlyBase {
   Quarter_Revenue: number | null;
   Quarter_Profit: number | null;
   Quarter_Equity: number | null;
