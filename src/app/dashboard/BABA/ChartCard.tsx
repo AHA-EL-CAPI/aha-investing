@@ -62,7 +62,7 @@ export const ChartCard = ({
         />
         <Tooltip
           formatter={(value, name) => {
-            const lowerName = name.toLowerCase();
+            const lowerName = String(name).toLowerCase();
 
             if (lowerName.includes("roe") || lowerName.includes("%")) {
               return [`${(value * 1).toFixed(2)}%`, name];
