@@ -6,7 +6,7 @@ import { stockData } from '@/data/ECOPETROL/Data';
 
 import { valuationTable } from '@/data/ECOPETROL/ValuationData';
 
-import { ChartCard } from './ChartCard';
+import { ChartCard } from '@/components/ChartCard';
 import { PriceChart } from './PriceChart';
 
 
@@ -55,10 +55,10 @@ export default function Page() {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ChartCard title="Ingresos Totales" dataKey="Total_ingresos" tickFormatter={formatMillions} />
-        <ChartCard title="Efectivo Neto Operacional" dataKey="Efectivo_neto_generado_por_las_actividades_de_operación" tickFormatter={formatMillions} />
-        <ChartCard title="CAPEX" dataKey="Inversión_en_propiedad_planta_y_equipo" tickFormatter={formatMillions} />
-        <ChartCard title="FCF" dataKey="FCF" tickFormatter={formatMillions} />
+        <ChartCard title="Ingresos Totales" dataKey="Total_ingresos" data={stockData} currency="COP" tickFormatter={formatMillions} />
+        <ChartCard title="Efectivo Neto Operacional" dataKey="Efectivo_neto_generado_por_las_actividades_de_operación" data={stockData} currency="COP" tickFormatter={formatMillions} />
+        <ChartCard title="CAPEX" dataKey="Inversión_en_propiedad_planta_y_equipo" data={stockData} currency="COP" tickFormatter={formatMillions} />
+        <ChartCard title="FCF" dataKey="FCF" data={stockData} currency="COP" tickFormatter={formatMillions} />
       </div>
 
       {/* Table for YoY Data */}
@@ -77,7 +77,7 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr>
-                  <td className="border border-white px-4 py-2 text-center">Ingresos</td>
+                  <td className="border border-white px-4 py-2 text-center">Ingresos Totales</td>
                   <td className="border border-white px-4 py-2 text-center">
                     {lastData.Total_ingresos_ΔYoY_Pct !== null
                       ? `${lastData.Total_ingresos_ΔYoY_Pct.toFixed(2)}%`

@@ -13,7 +13,7 @@ import {
 
 // import TradingViewWidget from '@/components/TradingViewWidget';
 
-import { stockData } from '@/data/BCOLOMBIA/Data';
+import { stockData } from '@/data/AAPL/Data';
 
 import { createTooltipFormatter } from '@/components/createTooltipFormatter';
 
@@ -21,7 +21,7 @@ export const ChartCard = ({
   title,
   dataKey,
   tickFormatter,
-  yLabel = 'Billones de COP $',
+  yLabel = 'Billones de USD $',
 }: {
   title: string;
   dataKey: keyof typeof stockData[0];
@@ -55,15 +55,15 @@ export const ChartCard = ({
             value: yLabel,
             angle: -90,
             position: 'insideLeft',
-            dx: 10,
+            dx: 5,
             dy: 45,
             style: { fill: 'white' },
           }}
           tickFormatter={tickFormatter}
         />
-
+        
         <Tooltip
-          formatter={createTooltipFormatter('COP')}
+          formatter={createTooltipFormatter('USD')}
           labelFormatter={(label) => `Trimestre: ${label}`}
           contentStyle={{
             backgroundColor: '#111',

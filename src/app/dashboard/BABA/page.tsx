@@ -2,7 +2,7 @@
 
 // import TradingViewWidget from '@/components/TradingViewWidget';
 
-import { ChartCard } from './ChartCard';
+import { ChartCard } from '@/components/ChartCard';
 import { PriceChart } from './PriceChart';
 
 import { stockData } from '@/data/BABA/Data';
@@ -55,10 +55,10 @@ export default function Page() {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ChartCard title="Ingresos Totales" dataKey="Quarter_Revenue" tickFormatter={formatMillions} />
-        <ChartCard title="Efectivo Neto Operacional" dataKey="Quarter_Op_Cash" tickFormatter={formatMillions} />
-        <ChartCard title="CAPEX" dataKey="Quarter_CAPEX" tickFormatter={formatMillions} />
-        <ChartCard title="FCF" dataKey="Quarter_FCF" tickFormatter={formatMillions} />
+        <ChartCard title="Ingresos Totales" dataKey="Quarter_Revenue" data={stockData} currency="USD" tickFormatter={formatMillions} />
+        <ChartCard title="Efectivo Neto Operacional" dataKey="Quarter_Op_Cash" data={stockData} currency="USD" tickFormatter={formatMillions} />
+        <ChartCard title="CAPEX" dataKey="Quarter_CAPEX" data={stockData} currency="USD" tickFormatter={formatMillions} />
+        <ChartCard title="FCF" dataKey="Quarter_FCF" data={stockData} currency="USD" tickFormatter={formatMillions} />
       </div>
 
       {/* Table for YoY Data */}
@@ -77,7 +77,7 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr>
-                  <td className="border border-white px-4 py-2 text-center">Net Interest Income</td>
+                  <td className="border border-white px-4 py-2 text-center">Ingresos Totales</td>
                   <td className="border border-white px-4 py-2 text-center">
                     {lastData.QY_on_QY_Revenue_growth !== null
                       ? `${lastData.QY_on_QY_Revenue_growth.toFixed(2)}%`
@@ -85,7 +85,7 @@ export default function Page() {
                   </td>
                 </tr>
                 <tr>
-                  <td className="border border-white px-4 py-2 text-center">Net Income</td>
+                  <td className="border border-white px-4 py-2 text-center">Efectivo Neto Operacional</td>
                   <td className="border border-white px-4 py-2 text-center">
                     {lastData.QY_on_QY_Op_Cash_growth !== null
                       ? `${lastData.QY_on_QY_Op_Cash_growth.toFixed(2)}%`
@@ -93,7 +93,7 @@ export default function Page() {
                   </td>
                 </tr>
                 <tr>
-                  <td className="border border-white px-4 py-2 text-center">Equity</td>
+                  <td className="border border-white px-4 py-2 text-center">CAPEX</td>
                   <td className="border border-white px-4 py-2 text-center">
                     {lastData.QY_on_QY_Capex_growth !== null
                       ? `${lastData.QY_on_QY_Capex_growth.toFixed(2)}%`
@@ -101,7 +101,7 @@ export default function Page() {
                   </td>
                 </tr>
                 <tr>
-                  <td className="border border-white px-4 py-2 text-center">ROE</td>
+                  <td className="border border-white px-4 py-2 text-center">FCF</td>
                   <td className="border border-white px-4 py-2 text-center">
                     {lastData.QY_on_QY_FCF_growth !== null
                       ? `${lastData.QY_on_QY_FCF_growth.toFixed(2)}%`

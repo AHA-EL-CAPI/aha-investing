@@ -5,9 +5,9 @@
 import { ChartCard } from '@/components/ChartCard';
 import { PriceChart } from './PriceChart';
 
-import { stockData } from '@/data/NU/Data';
+import { stockData } from '@/data/AAPL/Data';
 
-import { valuationTable } from '@/data/NU/ValuationData';
+import { valuationTable } from '@/data/AAPL/ValuationData';
 
 
 const formatMillions = (value: number) =>
@@ -21,7 +21,7 @@ const lastData = stockData[stockData.length - 1];
 
 
 import { useEffect, useState } from 'react';
-import { priceHistory } from '@/data/NU/price-history'; // adjust path as needed
+import { priceHistory } from '@/data/AAPL/price-history'; // adjust path as needed
 
 type PricePoint = { date: string; close: number };
 
@@ -51,14 +51,14 @@ export default function Page() {
       <YouTubeBanner />
       
       <h1 className="text-3xl font-bold mb-6 text-black dark:text-white  text-center">
-        Principales Métricas de Nubank
+        Principales Métricas de Apple
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ChartCard title="Net Interest Income" dataKey="Quarter_Revenue" data={stockData} currency="USD" tickFormatter={formatMillions} />
-        <ChartCard title="Net Income" dataKey="Quarter_Profit" data={stockData} currency="USD" tickFormatter={formatMillions} />
-        <ChartCard title="Equity" dataKey="Quarter_Equity" data={stockData} currency="USD" tickFormatter={formatMillions} />
-        <ChartCard title="ROE" dataKey="Quarter_ROE" data={stockData} currency="USD" yLabel="Porcentaje (%)" />
+        <ChartCard title="Ingresos Totales" dataKey="Quarter_Revenue" data={stockData} currency="USD" tickFormatter={formatMillions} />
+        <ChartCard title="Efectivo Neto Operacional" dataKey="Quarter_Op_Cash" data={stockData} currency="USD" tickFormatter={formatMillions} />
+        <ChartCard title="CAPEX" dataKey="Quarter_CAPEX" data={stockData} currency="USD" tickFormatter={formatMillions} />
+        <ChartCard title="FCF" dataKey="Quarter_FCF" data={stockData} currency="USD" tickFormatter={formatMillions} />
       </div>
 
       {/* Table for YoY Data */}
@@ -77,7 +77,7 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr>
-                  <td className="border border-white px-4 py-2 text-center">Net Interest Income</td>
+                  <td className="border border-white px-4 py-2 text-center">Ingresos Totales</td>
                   <td className="border border-white px-4 py-2 text-center">
                     {lastData.QY_on_QY_Revenue_growth !== null
                       ? `${lastData.QY_on_QY_Revenue_growth.toFixed(2)}%`
@@ -85,26 +85,26 @@ export default function Page() {
                   </td>
                 </tr>
                 <tr>
-                  <td className="border border-white px-4 py-2 text-center">Net Income</td>
+                  <td className="border border-white px-4 py-2 text-center">Efectivo Neto Operacional</td>
                   <td className="border border-white px-4 py-2 text-center">
-                    {lastData.QY_on_QY_Profit_growth !== null
-                      ? `${lastData.QY_on_QY_Profit_growth.toFixed(2)}%`
+                    {lastData.QY_on_QY_Op_Cash_growth !== null
+                      ? `${lastData.QY_on_QY_Op_Cash_growth.toFixed(2)}%`
                       : 'N/A'}
                   </td>
                 </tr>
                 <tr>
-                  <td className="border border-white px-4 py-2 text-center">Equity</td>
+                  <td className="border border-white px-4 py-2 text-center">CAPEX</td>
                   <td className="border border-white px-4 py-2 text-center">
-                    {lastData.QY_on_QY_Equity_growth !== null
-                      ? `${lastData.QY_on_QY_Equity_growth.toFixed(2)}%`
+                    {lastData.QY_on_QY_Capex_growth !== null
+                      ? `${lastData.QY_on_QY_Capex_growth.toFixed(2)}%`
                       : 'N/A'}
                   </td>
                 </tr>
                 <tr>
-                  <td className="border border-white px-4 py-2 text-center">ROE</td>
+                  <td className="border border-white px-4 py-2 text-center">FCF</td>
                   <td className="border border-white px-4 py-2 text-center">
-                    {lastData.QY_on_QY_ROE_growth !== null
-                      ? `${lastData.QY_on_QY_ROE_growth.toFixed(2)}%`
+                    {lastData.QY_on_QY_FCF_growth !== null
+                      ? `${lastData.QY_on_QY_FCF_growth.toFixed(2)}%`
                       : 'N/A'}
                   </td>
                 </tr>

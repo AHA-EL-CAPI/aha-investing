@@ -1,6 +1,8 @@
 export default function Home() {
   const companies = [
+    { name: "AMD", symbol: "AMD", image: "/logos/amd.png", addStroke: false },
     { name: "Alibaba", symbol: "BABA", image: "/logos/baba.png", addStroke: false },
+    { name: "Apple", symbol: "AAPL", image: "/logos/aapl.png", addStroke: false },
     { name: "Bancolombia", symbol: "BCOLOMBIA", image: "/logos/bcolombia.png", addStroke: true },
     { name: "Ecopetrol", symbol: "ECOPETROL", image: "/logos/ecopetrol.png", addStroke: false },
     { name: "Nubank", symbol: "NU", image: "/logos/nu.png", addStroke: false },

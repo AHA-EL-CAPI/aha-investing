@@ -19,7 +19,7 @@ export function createTooltipFormatter(currency: Currency) {
     return [
       `${unitSymbol}${numValue.toLocaleString(locale, {
         minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
+        maximumFractionDigits: 2,
       })} ${unitSuffix}`,
       name,
     ];

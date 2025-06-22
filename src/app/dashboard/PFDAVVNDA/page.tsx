@@ -2,7 +2,7 @@
 
 // import TradingViewWidget from '@/components/TradingViewWidget';
 
-import { ChartCard } from './ChartCard';
+import { ChartCard } from '@/components/ChartCard';
 import { PriceChart } from './PriceChart';
 
 import { stockData } from '@/data/PFDAVVNDA/Data';
@@ -55,10 +55,10 @@ export default function Page() {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ChartCard title="Net Interest Income" dataKey="Net_Interest_Income" tickFormatter={formatMillions} />
-        <ChartCard title="Net Income" dataKey="Net_Income" tickFormatter={formatMillions} />
-        <ChartCard title="Equity" dataKey="Equity" tickFormatter={formatMillions} />
-        <ChartCard title="ROE" dataKey="ROE" yLabel="Porcentaje (%)" />
+        <ChartCard title="Net Interest Income" dataKey="Net_Interest_Income" data={stockData} currency="COP" tickFormatter={formatMillions} />
+        <ChartCard title="Net Income" dataKey="Net_Income" data={stockData} currency="COP" tickFormatter={formatMillions} />
+        <ChartCard title="Equity" dataKey="Equity" data={stockData} currency="COP" tickFormatter={formatMillions} />
+        <ChartCard title="ROE" dataKey="ROE" data={stockData} currency="COP" yLabel="Porcentaje (%)" />
       </div>
 
       {/* Table for YoY Data */}
