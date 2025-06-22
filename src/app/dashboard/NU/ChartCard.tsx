@@ -15,6 +15,10 @@ import {
 
 import { stockData } from '@/data/NU/Data';
 
+import { createTooltipFormatter } from "@/utils/formatters";
+
+const tooltipFormatter = createTooltipFormatter("USD"); // or "COP"
+
 export const ChartCard = ({
   title,
   dataKey,
@@ -61,21 +65,7 @@ export const ChartCard = ({
           tickFormatter={tickFormatter}
         />
         <Tooltip
-          formatter={(value, name) => {
-            const lowerName = String(name).toLowerCase();
-
-            if (lowerName.includes("roe") || lowerName.includes("%")) {
-              return [`${(value * 1).toFixed(2)}%`, name];
-            }
-
-            return [
-              `USD $${value.toLocaleString('es-CO', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-              })} B`,
-              name
-            ];
-          }}
+          formatter={tooltipFormatter}
           labelFormatter={(label) => `Trimestre: ${label}`}
           contentStyle={{
             backgroundColor: '#111', // Tooltip background

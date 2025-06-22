@@ -15,6 +15,10 @@ import {
 
 import { stockData } from '@/data/BCOLOMBIA/Data';
 
+import { createTooltipFormatter } from "@/utils/formatters";
+
+const tooltipFormatter = createTooltipFormatter("COP"); // or "COP"
+
 export const ChartCard = ({
   title,
   dataKey,
@@ -61,21 +65,7 @@ export const ChartCard = ({
           tickFormatter={tickFormatter}
         />
         <Tooltip
-          formatter={(value, name) => {
-            const lowerName = name.toLowerCase();
-
-            if (lowerName.includes("roe") || lowerName.includes("%")) {
-              return [`${(value * 1).toFixed(2)}%`, name];
-            }
-
-            return [
-              `COP $${value.toLocaleString('es-CO', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-              })} M`,
-              name
-            ];
-          }}
+          formatter={tooltipFormatter}
           labelFormatter={(label) => `Trimestre: ${label}`}
           contentStyle={{
             backgroundColor: '#111', // Tooltip background
