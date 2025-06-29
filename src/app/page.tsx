@@ -14,7 +14,8 @@ export default function Home() {
     { name: "Microsoft", symbol: "MSFT", image: "/logos/msft.png", addStroke: false },
     { name: "Netflix", symbol: "NFLX", image: "/logos/nflx.png", addStroke: false },
     { name: "Nvidia", symbol: "NVDA", image: "/logos/nvda.png", addStroke: false },
-    { name: "Tesla", symbol: "TSLA", image: "/logos/tsla.png", addStroke: false }
+    { name: "Tesla", symbol: "TSLA", image: "/logos/tsla.png", addStroke: false },
+    { name: "Nike", symbol: "NKE", image: "/logos/nke.png", addStroke: false }
   ];
 
   return (
