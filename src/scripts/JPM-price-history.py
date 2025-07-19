@@ -4,7 +4,7 @@ import yfinance as yf
 import pandas as pd
 import json
 
-ticker = yf.Ticker("PFDAVVNDA.CL")
+ticker = yf.Ticker("JPM")
 data = ticker.history(period="1y")  # You can also use "5y", "1y", etc.
 
 # Reduce data to only date and closing price
@@ -13,9 +13,7 @@ result = [{"date": str(idx.date()), "close": round(row["Close"], 2)} for idx, ro
 # print(json.dumps(result))
 
 # Convert to valid TypeScript export
-with open("src/data/PFDAVVNDA/price-history.ts", "w", encoding="utf-8") as f:
+with open("src/data/JPM/price-history.ts", "w", encoding="utf-8") as f:
     f.write("export const priceHistory = ")
     f.write(json.dumps(result, indent=2))  # convert to double quotes for valid TS
     f.write(";\n")
-
-

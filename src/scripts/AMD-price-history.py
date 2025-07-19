@@ -15,7 +15,7 @@ result = [{"date": str(idx.date()), "close": round(row["Close"], 2)} for idx, ro
 # Convert to valid TypeScript export
 with open("src/data/AMD/price-history.ts", "w", encoding="utf-8") as f:
     f.write("export const priceHistory = ")
-    f.write(str(result).replace("'", '"'))  # convert to double quotes for valid TS
+    f.write(json.dumps(result, indent=2))  # convert to double quotes for valid TS
     f.write(";\n")
 
 

@@ -15,7 +15,8 @@ export default function Home() {
     { name: "Netflix", symbol: "NFLX", image: "/logos/nflx.png", addStroke: false },
     { name: "Nvidia", symbol: "NVDA", image: "/logos/nvda.png", addStroke: false },
     { name: "Tesla", symbol: "TSLA", image: "/logos/tsla.png", addStroke: false },
-    { name: "Nike", symbol: "NKE", image: "/logos/nke.png", addStroke: false }
+    { name: "Nike", symbol: "NKE", image: "/logos/nke.png", addStroke: true },
+    { name: "JPMorgan", symbol: "JPM", image: "/logos/jpm.png", addStroke: false }
   ];
 
   return (
@@ -40,11 +41,11 @@ export default function Home() {
           <div className="grid grid-cols-5 sm:grid-cols-5 md:grid-cols-5 lg:grid-cols-5 gap-6 justify-items-center">
             {companies.map(({ name, symbol, image, addStroke }) => (
               <a key={symbol} href={`/dashboard/${symbol}`} className="group w-full flex flex-col items-center">
-                <div className="w-full max-w-[180px] max-h-[180px] overflow-hidden flex items-center justify-center">
+                <div className="w-full max-w-[180px] max-h-[180px] overflow-visible flex items-center justify-center">
                   <img
                     src={image}
                     alt={`Dashboard ${name}`}
-                    className={`w-full h-full object-contain transition-transform duration-300 group-hover:scale-105 ${
+                    className={`w-full h-full object-contain transition-transform duration-300 group-hover:scale-125 ${
                       addStroke ? 'drop-shadow-[0_0_2px_white] drop-shadow-[0_0_2px_white]' : ''
                     }`}
                   />
