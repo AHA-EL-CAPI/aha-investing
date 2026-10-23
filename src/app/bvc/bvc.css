@@ -1,0 +1,15 @@
+/* Tailwind solo para /bvc, con prefijo tw: y sin el reset global, para no cambiar el resto del sitio */
+@layer theme, base, utilities;
+@import "tailwindcss/theme.css" layer(theme) prefix(tw);
+@import "tailwindcss/utilities.css" layer(utilities) prefix(tw);
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  .bvc, .bvc *, .bvc ::before, .bvc ::after { box-sizing: border-box; border: 0 solid; margin: 0; padding: 0; }
+  .bvc { font-family: var(--font-geist-sans), system-ui, sans-serif; line-height: 1.5; }
+  .bvc button { font: inherit; color: inherit; background: none; cursor: pointer; }
+  .bvc a { color: inherit; text-decoration: inherit; }
+  .bvc table { border-collapse: collapse; }
+  .bvc h1, .bvc h2 { font-size: inherit; font-weight: inherit; }
+}
