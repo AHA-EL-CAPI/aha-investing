@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Bar,
   BarChart,
@@ -104,6 +104,12 @@ export default function Ficha({ c }: { c: CompanyView }) {
     now && med ? `${now > med ? '+' : ''}${pct(now / med - 1, 0)} vs. su mediana de 5 años (${times(med, med < 3 ? 2 : 1)})` : undefined;
 
   const current = c.statements.find((s) => s.code === stmt);
+
+  // La tabla trae todo el historial; arranca mostrando los trimestres más recientes (a la derecha)
+  const tableRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (tableRef.current) tableRef.current.scrollLeft = tableRef.current.scrollWidth;
+  }, [stmt]);
 
   return (
     <div className="tw:space-y-6">
@@ -214,7 +220,7 @@ export default function Ficha({ c }: { c: CompanyView }) {
       </div>
 
       {current && (
-        <Card title="Estados financieros" subtitle="Cifras de cada trimestre (el balance es el saldo al cierre)">
+        <Card title="Estados financieros" subtitle={`Cifras de cada trimestre (el balance es el saldo al cierre). ${current.periods.length} trimestres desde ${quarterLabel(current.periods[0])}; desliza a la izquierda para ver los anteriores.`}>
           <div className="tw:flex tw:gap-2 tw:mb-3">
             {c.statements.map((s) => (
               <button
@@ -230,11 +236,11 @@ export default function Ficha({ c }: { c: CompanyView }) {
               </button>
             ))}
           </div>
-          <div className="tw:overflow-x-auto">
+          <div ref={tableRef} className="tw:overflow-x-auto">
             <table className="tw:w-full tw:text-sm tw:text-fg">
               <thead>
                 <tr className="tw:bg-surface tw:border-b tw:border-line">
-                  <th className="tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-medium tw:uppercase tw:tracking-wider tw:text-muted">Cuenta</th>
+                  <th className="tw:sticky tw:left-0 tw:z-10 tw:bg-surface tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-medium tw:uppercase tw:tracking-wider tw:text-muted">Cuenta</th>
                   {current.periods.map((p) => (
                     <th key={p} className="tw:px-3 tw:py-2 tw:text-right tw:whitespace-nowrap tw:font-mono tw:text-xs tw:font-medium tw:text-muted">
                       {quarterLabel(p)}
@@ -245,7 +251,7 @@ export default function Ficha({ c }: { c: CompanyView }) {
               <tbody>
                 {current.rows.map((r) => (
                   <tr key={r.label} className="tw:border-t tw:border-grid">
-                    <td className="tw:px-3 tw:py-1.5 tw:whitespace-nowrap">{r.label}</td>
+                    <td className="tw:sticky tw:left-0 tw:z-10 tw:bg-surface tw:px-3 tw:py-1.5 tw:whitespace-nowrap">{r.label}</td>
                     {r.values.map((x, i) => (
                       <td key={i} className="tw:px-3 tw:py-1.5 tw:text-right tw:whitespace-nowrap tw:tabular-nums tw:font-mono">
                         {x === null ? '—' : r.label.startsWith('UPA') || r.label.startsWith('Acciones') ? price(x) : copShort(x)}
