@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Home() {
   const companies = [
     { name: "Bancolombia", symbol: "BCOLOMBIA", image: "/logos/bcolombia.png", addStroke: true },
@@ -32,6 +34,14 @@ export default function Home() {
            style={{ fontSize: 'clamp(1rem, 3vw, 2.5rem)' }}>
           Bienvenido a la fuente más accesible y gratuita para análisis fundamentales de acciones colombianas e internacionales. Aquí encontrarás métricas clave como ingresos, utilidad neta, FCF y más.
         </p>
+
+        {/* ACCIONES COLOMBIANAS (datos oficiales de SIMEV) */}
+        <Link
+          href="/bvc"
+          style={{ display: 'inline-block', margin: '0 0 2.5rem', padding: '0.75rem 1.5rem', borderRadius: '0.75rem', background: '#22c55e', color: '#000', fontWeight: 700, fontSize: '1.25rem', textDecoration: 'none' }}
+        >
+          Acciones colombianas: comparador con datos oficiales →
+        </Link>
 
         {/* DASHBOARDS TITLE */}
         <h2 className="text-3xl font-bold mb-6 text-black dark:text-white">Dashboards</h2>
