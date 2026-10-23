@@ -16,6 +16,7 @@ import {
 } from 'recharts';
 import type { CompanyView } from '@/lib/bvc';
 import { cop, copShort, pct, price, quarterLabel, times } from '@/lib/bvcFormat';
+import { GLOSARIO } from '../glosario';
 
 const AXIS = { fill: '#9ca3af', fontSize: 12 };
 const GRID = '#9ca3af33';
@@ -39,10 +40,18 @@ function Card({ title, subtitle, children }: { title: string; subtitle?: string;
   );
 }
 
-function Tile({ label, value, note }: { label: string; value: string; note?: string }) {
+function Tile({ label, value, note, term }: { label: string; value: string; note?: string; term?: string }) {
+  const help = term ? GLOSARIO[term] : undefined;
   return (
-    <div className="tw:bg-white tw:dark:bg-black tw:rounded-2xl tw:shadow tw:p-4">
-      <div className="tw:text-xs tw:uppercase tw:tracking-wide tw:text-gray-500">{label}</div>
+    <div className="tw:bg-white tw:dark:bg-black tw:rounded-2xl tw:shadow tw:p-4" title={help ? `${help.name}: ${help.short}` : undefined}>
+      <div className="tw:text-xs tw:uppercase tw:tracking-wide tw:text-gray-500">
+        {label}
+        {help && (
+          <a href="#glosario" className="tw:ml-1 tw:text-gray-400 tw:no-underline" aria-label={`Qué es ${help.name}`}>
+            ⓘ
+          </a>
+        )}
+      </div>
       <div className="tw:text-2xl tw:font-bold tw:text-black tw:dark:text-white tw:tabular-nums">{value}</div>
       {note && <div className="tw:text-xs tw:text-gray-500 tw:mt-1">{note}</div>}
     </div>
@@ -88,7 +97,7 @@ export default function Ficha({ c }: { c: CompanyView }) {
     return {
       pe: median(recent.map((p) => p.pe).filter((x): x is number => ok(x, 100))),
       pb: median(recent.map((p) => p.pb).filter((x): x is number => ok(x, 20))),
-      series: recent.map((p) => ({ date: p.date, 'P/U': ok(p.pe, 100) ? p.pe : null, 'P/VL': ok(p.pb, 20) ? p.pb : null })),
+      series: recent.map((p) => ({ date: p.date, 'P/E': ok(p.pe, 100) ? p.pe : null, 'P/B': ok(p.pb, 20) ? p.pb : null })),
     };
   }, [c.prices]);
   const vsHist = (now: number | null | undefined, med: number | null) =>
@@ -100,11 +109,11 @@ export default function Ficha({ c }: { c: CompanyView }) {
     <div className="tw:space-y-6">
       <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-3 tw:lg:grid-cols-6 tw:gap-4">
         <Tile label="Precio" value={price(v.close)} note={c.summary.price_date ? `Cierre ${c.summary.price_date}` : undefined} />
-        <Tile label="Cap. bursátil" value={cop(v.market_cap)} />
-        <Tile label="P/U" value={times(v.pe)} note={vsHist(v.pe, hist.pe)} />
-        <Tile label="P/VL" value={times(v.pb, 2)} note={vsHist(v.pb, hist.pb)} />
-        <Tile label="Dividendo" value={pct(v.dividend_yield)} note="Últimos 12 meses / precio" />
-        <Tile label="ROE" value={pct(m.roe)} note={`A ${quarterLabel(c.lastPeriod)}`} />
+        <Tile label="Cap. bursátil" value={cop(v.market_cap)} term="market_cap" />
+        <Tile label="P/E" value={times(v.pe)} note={vsHist(v.pe, hist.pe)} term="pe" />
+        <Tile label="P/B" value={times(v.pb, 2)} note={vsHist(v.pb, hist.pb)} term="pb" />
+        <Tile label="Dividendo" value={pct(v.dividend_yield)} note="Últimos 12 meses / precio" term="dy" />
+        <Tile label="ROE" value={pct(m.roe)} note={`A ${quarterLabel(c.lastPeriod)}`} term="roe" />
       </div>
 
       <Card
@@ -169,8 +178,8 @@ export default function Ficha({ c }: { c: CompanyView }) {
               <YAxis yAxisId="pb" orientation="right" tick={AXIS} tickFormatter={(x: number) => times(x, 1)} />
               <Tooltip formatter={(val: number) => times(val, 2)} {...TOOLTIP} />
               <Legend />
-              <Line yAxisId="pe" dataKey="P/U" stroke={BLUE} dot={false} connectNulls />
-              <Line yAxisId="pb" dataKey="P/VL" stroke={AMBER} dot={false} connectNulls />
+              <Line yAxisId="pe" dataKey="P/E" stroke={BLUE} dot={false} connectNulls />
+              <Line yAxisId="pb" dataKey="P/B" stroke={AMBER} dot={false} connectNulls />
               {hist.pe && <ReferenceLine yAxisId="pe" y={hist.pe} stroke={BLUE} strokeDasharray="4 4" />}
               {hist.pb && <ReferenceLine yAxisId="pb" y={hist.pb} stroke={AMBER} strokeDasharray="4 4" />}
             </LineChart>

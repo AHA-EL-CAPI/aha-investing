@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { CompanySummary } from '@/lib/bvc';
 import { cop, pct, price, quarterLabel, sectorName, times } from '@/lib/bvcFormat';
+import { GLOSARIO } from './glosario';
 
 type Col = {
   key: string;
@@ -15,8 +16,8 @@ type Col = {
 const COLS: Col[] = [
   { key: 'close', label: 'Precio', get: (c) => c.valuation.close, show: price },
   { key: 'market_cap', label: 'Cap. bursátil', get: (c) => c.valuation.market_cap, show: cop },
-  { key: 'pe', label: 'P/U', get: (c) => c.valuation.pe, show: (v) => times(v) },
-  { key: 'pb', label: 'P/VL', get: (c) => c.valuation.pb, show: (v) => times(v, 2) },
+  { key: 'pe', label: 'P/E', get: (c) => c.valuation.pe, show: (v) => times(v) },
+  { key: 'pb', label: 'P/B', get: (c) => c.valuation.pb, show: (v) => times(v, 2) },
   { key: 'dy', label: 'Dividendo', get: (c) => c.valuation.dividend_yield, show: (v) => pct(v) },
   { key: 'roe', label: 'ROE', get: (c) => c.metrics.roe, show: (v) => pct(v) },
   { key: 'net_margin', label: 'Margen neto', get: (c) => c.metrics.net_margin, show: (v) => pct(v) },
@@ -77,8 +78,11 @@ export default function Comparador({ companies }: { companies: CompanySummary[] 
                   key={c.key}
                   className="tw:px-3 tw:py-2 tw:text-right tw:cursor-pointer tw:whitespace-nowrap tw:select-none"
                   onClick={() => toggle(c.key)}
+                  title={GLOSARIO[c.key] ? `${GLOSARIO[c.key].name}: ${GLOSARIO[c.key].short}` : undefined}
                 >
-                  {c.label} {sort.key === c.key ? (sort.desc ? '↓' : '↑') : ''}
+                  {c.label}
+                  {GLOSARIO[c.key] && <span className="tw:ml-1 tw:text-gray-400 tw:cursor-help">ⓘ</span>}{' '}
+                  {sort.key === c.key ? (sort.desc ? '↓' : '↑') : ''}
                 </th>
               ))}
             </tr>
