@@ -17,6 +17,7 @@ import {
 import type { CompanyView } from '@/lib/bvc';
 import { cop, copShort, pct, price, quarterLabel, times } from '@/lib/bvcFormat';
 import { GLOSARIO } from '../glosario';
+import EstadosPdf from './EstadosPdf';
 
 const AXIS = { fill: '#9ca3af', fontSize: 12 };
 const GRID = '#9ca3af33';
@@ -213,7 +214,9 @@ export default function Ficha({ c }: { c: CompanyView }) {
         </Card>
       </div>
 
-      {current && (
+      {c.pdf ? (
+        <EstadosPdf pdf={c.pdf} name={c.name} />
+      ) : current && (
         <Card title="Estados financieros" subtitle="Cifras de cada trimestre (el balance es el saldo al cierre)">
           <div className="tw:flex tw:gap-2 tw:mb-3">
             {c.statements.map((s) => (

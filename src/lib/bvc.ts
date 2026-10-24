@@ -29,6 +29,17 @@ export type CompanySummary = {
 
 type StatementRow = { item: string; label: string; quarter: Num[]; ttm: Num[] };
 
+// Estados completos leidos del PDF de cada informe (bvc-fundamentales/bvc/pdfingest.py): cada linea con su
+// etiqueta original; el balance trae el saldo y los demas el acumulado del ano (ytd) y el trimestre aislado
+type PdfLine = { label: string; level: number; per_share?: boolean; values?: Num[]; ytd?: Num[]; quarter?: Num[] };
+type PdfFile = { periods: string[] } & Partial<Record<'BS' | 'IS' | 'CF', PdfLine[]>>;
+
+export type PdfStatement = {
+  code: 'BS' | 'IS' | 'CF';
+  title: string;
+  rows: { label: string; level: number; perShare: boolean; total: boolean; quarter: Num[]; ytd: Num[] }[];
+};
+
 type CompanyFile = {
   id: string;
   name: string;
@@ -42,6 +53,7 @@ type CompanyFile = {
   coverage: Record<string, string>;
   prices?: { date: string[]; close: Num[]; pe: Num[]; pb: Num[]; dividend_yield: Num[]; market_cap: Num[] };
   metric_defs: MetricDef[];
+  pdf?: PdfFile;
 };
 
 // Lo que recibe la ficha en el navegador: solo las series que se grafican
@@ -66,6 +78,7 @@ export type CompanyView = {
   }[];
   prices: { date: string; close: Num; pe: Num; pb: Num; dy: Num }[];
   statements: { code: string; title: string; periods: string[]; rows: { label: string; values: Num[] }[] }[];
+  pdf: { periods: string[]; statements: PdfStatement[] } | null;
   missing: number;
   lastPeriod: string;
   summary: CompanySummary;
@@ -158,11 +171,35 @@ export function loadCompany(id: string): CompanyView | null {
     quarters,
     prices,
     statements,
+    pdf: pdfStatements(c.pdf),
     missing,
     lastPeriod: summary.last_period,
     summary,
     metricDefs: index.metric_defs,
   };
+}
+
+const PDF_TITLES = { BS: 'Situación financiera', IS: 'Resultados', CF: 'Flujos de efectivo' } as const;
+const TOTAL = /^(total|ganancia neta|utilidad neta|resultado neto|p[eé]rdida neta|efectivo .*al final|flujos? (de efectivo )?net|efectivo neto)/i;
+
+function pdfStatements(f: PdfFile | undefined): CompanyView['pdf'] {
+  if (!f) return null;
+  const statements = (['BS', 'IS', 'CF'] as const)
+    .filter((code) => f[code]?.length)
+    .map((code) => ({
+      code,
+      title: PDF_TITLES[code],
+      rows: f[code]!.map((r) => ({
+        label: r.label,
+        level: r.level,
+        perShare: !!r.per_share,
+        total: TOTAL.test(r.label.trim()),
+        // en el balance no hay trimestre aislado: ambas vistas muestran el saldo al cierre
+        quarter: r.quarter ?? r.values ?? [],
+        ytd: r.ytd ?? r.values ?? [],
+      })),
+    }));
+  return statements.length ? { periods: f.periods, statements } : null;
 }
 
 function weekKey(d: string): string {
