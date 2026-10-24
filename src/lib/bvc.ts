@@ -32,12 +32,16 @@ type StatementRow = { item: string; label: string; quarter: Num[]; ttm: Num[] };
 // Estados completos leidos del PDF de cada informe (bvc-fundamentales/bvc/pdfingest.py): cada linea con su
 // etiqueta original; el balance trae el saldo y los demas el acumulado del ano (ytd) y el trimestre aislado
 type PdfLine = { label: string; level: number; per_share?: boolean; values?: Num[]; ytd?: Num[]; quarter?: Num[] };
-type PdfFile = { periods: string[] } & Partial<Record<'BS' | 'IS' | 'CF', PdfLine[]>>;
+// unverified: informes cuyo estado no coincide con ninguna cifra clave del XBRL (se muestran marcados)
+type PdfFile = { periods: string[]; unverified?: Partial<Record<'BS' | 'IS' | 'CF', string[]>> } & Partial<
+  Record<'BS' | 'IS' | 'CF', PdfLine[]>
+>;
 
 export type PdfStatement = {
   code: 'BS' | 'IS' | 'CF';
   title: string;
   rows: { label: string; level: number; perShare: boolean; total: boolean; quarter: Num[]; ytd: Num[] }[];
+  unverified: string[];
 };
 
 type CompanyFile = {
@@ -207,6 +211,7 @@ function pdfStatements(f: PdfFile | undefined): CompanyView['pdf'] {
         quarter: r.quarter ?? r.values ?? [],
         ytd: r.ytd ?? r.values ?? [],
       })),
+      unverified: f.unverified?.[code] ?? [],
     }));
   return statements.length ? { periods: f.periods, statements } : null;
 }

@@ -62,9 +62,11 @@ export default function EstadosPdf({ pdf, name }: { pdf: NonNullable<CompanyView
 
   const head = (i: number) => {
     const p = pdf.periods[i];
-    if (v !== 'year') return quarterLabel(p);
-    return p.slice(5, 7) === '12' ? p.slice(0, 4) : `${p.slice(0, 4)} (a ${quarterLabel(p)})`;
+    const mark = stmt.unverified.includes(p) ? ' *' : '';
+    if (v !== 'year') return quarterLabel(p) + mark;
+    return (p.slice(5, 7) === '12' ? p.slice(0, 4) : `${p.slice(0, 4)} (a ${quarterLabel(p)})`) + mark;
   };
+  const marked = cols.some((i) => stmt.unverified.includes(pdf.periods[i]));
   const subtitle = isBs
     ? 'Saldo al cierre de cada trimestre'
     : v === 'quarter'
@@ -145,6 +147,12 @@ export default function EstadosPdf({ pdf, name }: { pdf: NonNullable<CompanyView
           </tbody>
         </table>
       </div>
+      {marked && (
+        <p className="tw:text-xs tw:text-gray-500 tw:mt-2">
+          * Ninguna cifra clave de esta columna coincide con el reporte XBRL de SIMEV (a veces por diferencias de
+          presentación). Antes de usarla, compárala con el PDF.
+        </p>
+      )}
       {v !== 'ytd' && !isBs && (
         <p className="tw:text-xs tw:text-gray-500 tw:mt-2">
           {v === 'quarter'
