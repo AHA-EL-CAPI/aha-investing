@@ -53,6 +53,10 @@ function combine(a: Series, b: Series, f: (x: number, y: number) => number): Ser
   }));
 }
 
+// a + b, tomando b como 0 cuando no viene reportado
+const addOptional = (a: Series, b: Series): Series =>
+  new Map([...a].map(([p, x]) => [p, x == null ? null : x + (b.get(p) ?? 0)]));
+
 const scale = (s: Series, k: number): Series => new Map([...s].map(([p, v]) => [p, v == null ? null : v * k]));
 
 function ttm(s: Series, p: string): Num {
@@ -101,7 +105,9 @@ function prices(c: CompanyFile): PricePoint[] {
 export function ecopetrolDashboard() {
   const c = read('ecopetrol');
   const cfo = scale(series(c, 'CF', 'cfo'), M);
-  const capex = scale(series(c, 'CF', 'capex_ppe'), -M); // negativo: salida de caja
+  // CAPEX como en el flujo de efectivo del PDF: propiedades, planta y equipo + recursos naturales e intangibles
+  // (negativo: salida de caja)
+  const capex = scale(addOptional(series(c, 'CF', 'capex_ppe'), series(c, 'CF', 'capex_intangibles')), -M);
   const fields = {
     Total_ingresos: scale(series(c, 'IS', 'revenue'), M),
     Efectivo_neto_generado_por_las_actividades_de_operación: cfo,
