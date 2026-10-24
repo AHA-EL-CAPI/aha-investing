@@ -5,6 +5,7 @@ import { companyIds, loadCompany } from '@/lib/bvc';
 import { quarterLabel, sectorName } from '@/lib/bvcFormat';
 import Ficha from './Ficha';
 import Glosario from '../Glosario';
+import InfoRelevante from './InfoRelevante';
 
 type Params = { params: Promise<{ empresa: string }> };
 
@@ -40,6 +41,7 @@ export default async function Page({ params }: Params) {
           Último informe {quarterLabel(c.lastPeriod)}
         </p>
         <Ficha c={c} />
+        <InfoRelevante news={c.news} url={c.simevUrl} name={c.name} />
         <Glosario keys={['pe', 'pb', 'dy', 'market_cap', 'roe', 'net_margin', 'fcf', 'ttm']} />
         <p className="tw:text-xs tw:text-gray-500 tw:mt-6">
           Fuente: informes XBRL publicados por {c.name} en SIMEV (Superintendencia Financiera de Colombia); precios de

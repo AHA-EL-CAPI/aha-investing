@@ -54,7 +54,12 @@ type CompanyFile = {
   prices?: { date: string[]; close: Num[]; pe: Num[]; pb: Num[]; dividend_yield: Num[]; market_cap: Num[] };
   metric_defs: MetricDef[];
   pdf?: PdfFile;
+  news?: NewsItem[];
+  simev_url?: string;
 };
+
+// Informacion relevante publicada en SIMEV (bvc-fundamentales/bvc/inforel.py)
+export type NewsItem = { date: string; topic: string; summary: string };
 
 // Lo que recibe la ficha en el navegador: solo las series que se grafican
 export type CompanyView = {
@@ -79,6 +84,8 @@ export type CompanyView = {
   prices: { date: string; close: Num; pe: Num; pb: Num; dy: Num }[];
   statements: { code: string; title: string; periods: string[]; rows: { label: string; values: Num[] }[] }[];
   pdf: { periods: string[]; statements: PdfStatement[] } | null;
+  news: NewsItem[];
+  simevUrl: string | null;
   missing: number;
   lastPeriod: string;
   summary: CompanySummary;
@@ -172,6 +179,8 @@ export function loadCompany(id: string): CompanyView | null {
     prices,
     statements,
     pdf: pdfStatements(c.pdf),
+    news: c.news ?? [],
+    simevUrl: c.simev_url ?? null,
     missing,
     lastPeriod: summary.last_period,
     summary,
