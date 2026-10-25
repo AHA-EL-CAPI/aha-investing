@@ -411,7 +411,8 @@ export default function Home() {
                 Ver el canal en YouTube
               </a>
             </div>
-            <div className="relative aspect-[4/3] w-full self-end md:aspect-auto md:h-full md:min-h-[340px]">
+            {/* Misma proporción que la foto (16:9) para que el logo quede siempre sobre la mano */}
+            <div className="relative aspect-video w-full self-end">
               <Image
                 src="/me.png"
                 alt="Alejandro señalando el canal de YouTube"
@@ -419,6 +420,15 @@ export default function Home() {
                 sizes="(min-width: 768px) 50vw, 100vw"
                 className="object-contain object-bottom"
               />
+              <a
+                href={YOUTUBE}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Ver el canal de AHA Investing en YouTube"
+                className="yt-float absolute bottom-[62%] left-[69%] w-[20%] transition hover:scale-110 motion-reduce:transition-none"
+              >
+                <Image src="/youtube logo alone.png" alt="" width={1280} height={720} sizes="20vw" className="h-auto w-full drop-shadow-[0_10px_18px_rgba(0,0,0,0.5)]" />
+              </a>
             </div>
           </section>
         </div>

@@ -118,3 +118,18 @@ h1, h2, h3 {
     animation: none;
   }
 }
+
+/* Portada: el logo de YouTube flota suave sobre la mano */
+.yt-float {
+  animation: yt-float 3s ease-in-out infinite;
+}
+@keyframes yt-float {
+  50% {
+    translate: 0 -6%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .yt-float {
+    animation: none;
+  }
+}
