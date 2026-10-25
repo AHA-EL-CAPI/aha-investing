@@ -224,3 +224,17 @@ function weekKey(d: string): string {
   monday.setUTCDate(t.getUTCDate() - ((t.getUTCDay() + 6) % 7));
   return monday.toISOString().slice(0, 10);
 }
+
+// Precios del último año de cada emisor para la portada (minigráfica y variación a 12 meses)
+export function loadPriceTrail(id: string): { date: string; close: number }[] {
+  const c = readJson<CompanyFile>(`${id}.json`);
+  if (!c.prices || c.prices.date.length === 0) return [];
+  const last = c.prices.date[c.prices.date.length - 1];
+  const from = `${Number(last.slice(0, 4)) - 1}${last.slice(4)}`;
+  const out: { date: string; close: number }[] = [];
+  c.prices.date.forEach((d, i) => {
+    const v = c.prices!.close[i];
+    if (d >= from && v !== null) out.push({ date: d, close: v });
+  });
+  return out;
+}

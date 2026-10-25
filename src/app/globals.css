@@ -90,3 +90,31 @@ h1, h2, h3 {
   color: var(--fg);
   font-weight: 600;
 }
+
+/* Portada: cuadrícula tenue detrás de la presentación */
+.hero-grid {
+  background-image:
+    linear-gradient(to right, var(--grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 30%, transparent 75%);
+  opacity: 0.6;
+}
+
+/* Portada: cinta de precios que se desplaza sola (quieta si el visitante pide menos movimiento) */
+.marquee {
+  animation: marquee 60s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(calc(-50% - 1rem));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    animation: none;
+  }
+}

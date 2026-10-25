@@ -10,12 +10,13 @@ export function SiteHeader() {
         </Link>
         <nav className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-muted">
           <Link href="/bvc" className="hover:text-fg">
-            Acciones colombianas
+            <span className="sm:hidden">Colombia</span>
+            <span className="hidden sm:inline">Acciones colombianas</span>
           </Link>
           <Link href="/#internacionales" className="hover:text-fg">
             Internacionales
           </Link>
-          <Link href="/bvc#glosario" className="hover:text-fg">
+          <Link href="/bvc#glosario" className="hidden hover:text-fg sm:inline">
             Glosario
           </Link>
           <a
