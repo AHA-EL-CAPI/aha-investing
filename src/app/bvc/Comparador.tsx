@@ -13,6 +13,9 @@ type Col = {
   show: (v: number | null | undefined) => string;
 };
 
+// Encabezado fijo al bajar por la tabla
+const TH = 'tw:sticky tw:top-0 tw:z-10 tw:bg-surface tw:border-b tw:border-line tw:px-3 tw:py-2.5 tw:whitespace-nowrap tw:font-mono tw:text-xs tw:font-medium tw:uppercase tw:tracking-wider tw:text-muted';
+
 const COLS: Col[] = [
   { key: 'close', label: 'Precio', get: (c) => c.valuation.close, show: price },
   { key: 'market_cap', label: 'Cap. bursátil', get: (c) => c.valuation.market_cap, show: cop },
@@ -56,8 +59,8 @@ export default function Comparador({ companies }: { companies: CompanySummary[] 
             onClick={() => setSector(s)}
             className={`tw:px-3 tw:py-1 tw:rounded-full tw:text-sm tw:border tw:transition-colors ${
               sector === s
-                ? 'tw:bg-black tw:text-white tw:border-black tw:dark:bg-white tw:dark:text-black tw:dark:border-white'
-                : 'tw:border-gray-300 tw:text-gray-700 tw:hover:border-gray-500 tw:dark:border-neutral-700 tw:dark:text-gray-300'
+                ? 'tw:bg-accent tw:text-accent-ink tw:border-accent tw:font-semibold'
+                : 'tw:border-line tw:text-muted tw:hover:border-accent tw:hover:text-fg'
             }`}
           >
             {s === 'todos' ? 'Todos' : sectorName(s)}
@@ -65,23 +68,23 @@ export default function Comparador({ companies }: { companies: CompanySummary[] 
         ))}
       </div>
 
-      <div className="tw:overflow-x-auto tw:rounded-2xl tw:shadow tw:bg-white tw:dark:bg-black">
-        <table className="tw:w-full tw:text-sm tw:text-black tw:dark:text-white">
+      <div className="tw:overflow-auto tw:max-h-[75vh] tw:rounded-xl tw:border tw:border-line tw:bg-surface">
+        <table className="tw:w-full tw:text-sm tw:text-fg">
           <thead>
-            <tr className="tw:bg-gray-200 tw:dark:bg-neutral-800">
-              <th className="tw:px-3 tw:py-2 tw:text-left tw:cursor-pointer tw:whitespace-nowrap" onClick={() => toggle('name')}>
+            <tr>
+              <th className={`${TH} tw:text-left tw:cursor-pointer ${sort.key === 'name' ? 'tw:text-accent' : ''}`} onClick={() => toggle('name')}>
                 Empresa {sort.key === 'name' ? (sort.desc ? '↓' : '↑') : ''}
               </th>
-              <th className="tw:px-3 tw:py-2 tw:text-left tw:whitespace-nowrap">Último informe</th>
+              <th className={`${TH} tw:text-left`}>Último informe</th>
               {COLS.map((c) => (
                 <th
                   key={c.key}
-                  className="tw:px-3 tw:py-2 tw:text-right tw:cursor-pointer tw:whitespace-nowrap tw:select-none"
+                  className={`${TH} tw:text-right tw:cursor-pointer tw:select-none ${sort.key === c.key ? 'tw:text-accent' : ''}`}
                   onClick={() => toggle(c.key)}
                   title={GLOSARIO[c.key] ? `${GLOSARIO[c.key].name}: ${GLOSARIO[c.key].short}` : undefined}
                 >
                   {c.label}
-                  {GLOSARIO[c.key] && <span className="tw:ml-1 tw:text-gray-400 tw:cursor-help">ⓘ</span>}{' '}
+                  {GLOSARIO[c.key] && <span className="tw:ml-1 tw:text-muted tw:cursor-help">ⓘ</span>}{' '}
                   {sort.key === c.key ? (sort.desc ? '↓' : '↑') : ''}
                 </th>
               ))}
@@ -89,19 +92,19 @@ export default function Comparador({ companies }: { companies: CompanySummary[] 
           </thead>
           <tbody>
             {rows.map((c) => (
-              <tr key={c.id} className="tw:border-t tw:border-gray-200 tw:dark:border-neutral-800 tw:hover:bg-gray-50 tw:dark:hover:bg-neutral-900">
-                <td className="tw:px-3 tw:py-2 tw:whitespace-nowrap">
-                  <Link href={`/bvc/${c.id}`} className="tw:font-semibold tw:hover:underline">
+              <tr key={c.id} className="tw:border-t tw:border-grid tw:hover:bg-surface-2">
+                <td className="tw:px-3 tw:py-2.5 tw:whitespace-nowrap">
+                  <Link href={`/bvc/${c.id}`} className="tw:font-semibold tw:text-fg tw:hover:text-accent">
                     {c.name}
                   </Link>
-                  <div className="tw:text-xs tw:text-gray-500">
+                  <div className="tw:text-xs tw:text-muted">
                     {sectorName(c.sector)}
                     {c.ticker ? ` · ${c.ticker.split(';').join(', ')}` : ''}
                   </div>
                 </td>
-                <td className="tw:px-3 tw:py-2 tw:whitespace-nowrap">{quarterLabel(c.last_period)}</td>
+                <td className="tw:px-3 tw:py-2.5 tw:whitespace-nowrap tw:font-mono tw:text-muted">{quarterLabel(c.last_period)}</td>
                 {COLS.map((col) => (
-                  <td key={col.key} className="tw:px-3 tw:py-2 tw:text-right tw:whitespace-nowrap tw:tabular-nums">
+                  <td key={col.key} className="tw:px-3 tw:py-2.5 tw:text-right tw:whitespace-nowrap tw:tabular-nums tw:font-mono">
                     {col.show(col.get(c))}
                   </td>
                 ))}

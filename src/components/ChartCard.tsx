@@ -1,15 +1,6 @@
 'use client';
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 import { createTooltipFormatter } from './createTooltipFormatter';
 import { QuarterlyBase } from '@/types/QuarterlyBase'; // ✅ NEW: shared type
@@ -19,73 +10,71 @@ type ChartCardProps = {
   dataKey: keyof QuarterlyBase;
   data: QuarterlyBase[];
   currency: 'USD' | 'COP';
-  tickFormatter?: (value: number) => string;
+  divisor?: number; // las cifras se muestran divididas por este número (p. ej. 1_000_000)
   yLabel?: string;
 };
+
+const isPercent = (yLabel: string) => yLabel.includes('%');
 
 export const ChartCard = ({
   title,
   dataKey,
   data,
   currency,
-  tickFormatter,
+  divisor,
   yLabel = currency === 'USD' ? 'Billones de USD $' : 'Billones de COP $',
-}: ChartCardProps) => (
-  <div className="bg-white dark:bg-black p-4 rounded-2xl shadow mb-6 w-full">
-    <h2 className="text-xl font-bold mb-2 text-black dark:text-white">{title}</h2>
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={data} margin={{ top: 20, right: 20, bottom: 40, left: 20 }}>
-        <CartesianGrid stroke="#444444" strokeDasharray="3 3" />
-        <XAxis
-          dataKey="quarter"
-          stroke="white"
-          axisLine={{ stroke: 'white' }}
-          tickLine={{ stroke: 'white' }}
-          tick={{ fill: 'white' }}
-          label={{
-            value: 'Trimestre',
-            position: 'insideBottom',
-            offset: -10,
-            style: { fill: 'white', fontSize: 20 },
-          }}
-        />
-        <YAxis
-          stroke="white"
-          tick={{ fill: 'white' }}
-          tickLine={{ stroke: 'white' }}
-          axisLine={{ stroke: 'white' }}
-          label={{
-            value: yLabel,
-            angle: -90,
-            position: 'insideLeft',
-            dx: 5,
-            dy: 45,
-            style: { fill: 'white' },
-          }}
-          tickFormatter={tickFormatter}
-        />
-        <Tooltip
-          formatter={createTooltipFormatter(currency)}
-          labelFormatter={(label) => `Trimestre: ${label}`}
-          contentStyle={{
-            backgroundColor: '#111',
-            border: '1px solid #888',
-            color: 'white',
-          }}
-          labelStyle={{ color: 'white', fontWeight: 'bold' }}
-          itemStyle={{ color: 'white' }}
-          wrapperStyle={{ zIndex: 1000 }}
-        />
-        <Bar dataKey={dataKey} name={title} radius={[4, 4, 0, 0]}>
-          {data.map((entry, index) => {
-            const rawValue = entry[dataKey];
-            const value = typeof rawValue === 'number' ? rawValue : null;
-            const fill = value !== null && value >= 0 ? '#22c55e' : '#ef4444';
+}: ChartCardProps) => {
+  const tickFormatter = divisor ? (value: number) => (value / divisor).toFixed(1) : undefined;
+  const last = data.at(-1);
+  // El rojo marca valores negativos solo en series que también tienen positivos (el CAPEX siempre es negativo)
+  const mixed = data.some((d) => typeof d[dataKey] === 'number' && (d[dataKey] as number) > 0);
+  const isNeg = (v: number | null) => mixed && v !== null && v < 0;
+  const lastValue = typeof last?.[dataKey] === 'number' ? (last[dataKey] as number) : null;
+  const lastText =
+    lastValue === null
+      ? 'N/A'
+      : isPercent(yLabel)
+        ? `${lastValue.toLocaleString('es-CO', { maximumFractionDigits: 1 })}%`
+        : tickFormatter
+          ? tickFormatter(lastValue).replace('.', ',')
+          : lastValue.toLocaleString('es-CO', { maximumFractionDigits: 1 });
 
-            return <Cell key={`cell-${index}`} fill={fill} />;
-          })}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
-  </div>
-);
+  return (
+    <section className="flex w-full min-w-0 flex-col gap-3 rounded-xl border border-line bg-surface p-4 sm:p-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 className="text-lg font-semibold text-fg">{title}</h2>
+        <span className="font-mono text-xs text-muted">{yLabel}</span>
+      </div>
+      <div className="flex items-baseline gap-2">
+        <span className={`font-mono text-2xl font-semibold ${isNeg(lastValue) ? 'text-neg' : 'text-fg'}`}>
+          {lastText}
+        </span>
+        {last && <span className="text-sm text-muted">{last.quarter}</span>}
+      </div>
+      <ResponsiveContainer width="100%" height={260}>
+        <BarChart data={data} margin={{ top: 8, right: 4, bottom: 0, left: -8 }}>
+          <CartesianGrid stroke="var(--grid)" vertical={false} />
+          <XAxis dataKey="quarter" tickLine={false} axisLine={{ stroke: 'var(--line)' }} minTickGap={16} />
+          <YAxis tickLine={false} axisLine={false} tickFormatter={tickFormatter} width={48} />
+          <Tooltip
+            formatter={createTooltipFormatter(currency)}
+            labelFormatter={(label) => `Trimestre: ${label}`}
+            cursor={{ fill: 'var(--surface-2)' }}
+            itemStyle={{ color: 'var(--fg)' }}
+            wrapperStyle={{ zIndex: 1000 }}
+          />
+          <Bar dataKey={dataKey} name={title} radius={[3, 3, 0, 0]}>
+            {data.map((entry, index) => {
+              const rawValue = entry[dataKey];
+              const value = typeof rawValue === 'number' ? rawValue : null;
+              const fill =
+                isNeg(value) ? 'var(--neg)' : index === data.length - 1 ? 'var(--accent)' : 'var(--bar)';
+
+              return <Cell key={`cell-${index}`} fill={fill} />;
+            })}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </section>
+  );
+};

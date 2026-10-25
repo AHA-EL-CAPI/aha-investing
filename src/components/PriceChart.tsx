@@ -1,65 +1,56 @@
 'use client';
 
-import {
-  LineChart, 
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 type PricePoint = { date: string; close: number };
 
 type PriceChartProps = {
   priceData: PricePoint[];
   companyName: string; // 👈 new prop
+  currency?: 'USD' | 'COP';
 };
 
-export function PriceChart({ priceData, companyName }: PriceChartProps) {
+const fmt = (val: number) =>
+  new Intl.NumberFormat('es-CO', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(val);
+
+export function PriceChart({ priceData, companyName, currency = 'USD' }: PriceChartProps) {
+  const last = priceData.at(-1);
   return (
-    <div className="bg-white dark:bg-black p-4 rounded-2xl shadow mb-12 w-full">
-      <h2 className="text-xl font-bold mb-4 text-black dark:text-white text-center">
-        Precio Histórico ({companyName})
-      </h2>
+    <section className="flex w-full min-w-0 flex-col gap-3 rounded-xl border border-line bg-surface p-4 sm:p-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 className="text-lg font-semibold text-fg">Precio histórico ({companyName})</h2>
+        <span className="font-mono text-xs text-muted">{currency} $</span>
+      </div>
+      {last && (
+        <div className="flex items-baseline gap-2">
+          <span className="font-mono text-2xl font-semibold text-fg">
+            {currency} $ {fmt(last.close)}
+          </span>
+          <span className="text-sm text-muted">último cierre</span>
+        </div>
+      )}
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart
-          data={priceData}
-          margin={{ top: 20, right: 20, bottom: 40, left: 20 }}
-        >
-          <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+        <AreaChart data={priceData} margin={{ top: 8, right: 4, bottom: 0, left: -8 }}>
+          <defs>
+            <linearGradient id="priceFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.28} />
+              <stop offset="100%" stopColor="var(--accent)" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid stroke="var(--grid)" vertical={false} />
           <XAxis
             dataKey="date"
-            tickFormatter={(val) => val}
-            minTickGap={50}
-            tick={{ fill: 'white' }}
+            tickLine={false}
+            axisLine={{ stroke: 'var(--line)' }}
+            minTickGap={60}
+            tickFormatter={(d: string) => String(d).slice(0, 7)}
           />
-          <YAxis
-            domain={['auto', 'auto']}
-            tick={{ fill: 'white' }}
-            tickFormatter={(val) =>
-              new Intl.NumberFormat('es-CO', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-              }).format(val)
-            }
-            label={{
-              value: 'USD $',
-              angle: -90,
-              position: 'insideLeft',
-              dx: -10,
-              style: { fill: 'white', fontWeight: 'bold' },
-            }}
-          />
+          <YAxis domain={['auto', 'auto']} tickLine={false} axisLine={false} tickFormatter={fmt} width={56} />
           <Tooltip
-            formatter={(value: number) => [
-              `USD $ ${new Intl.NumberFormat('es-CO', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-              }).format(value)}`,
-              'Cierre',
-            ]}
+            formatter={(value: number) => [`${currency} $ ${fmt(value)}`, 'Cierre']}
             labelFormatter={(label) => {
               const date = new Date(label);
               const formatted = date.toLocaleDateString('es-CO', {
@@ -69,16 +60,11 @@ export function PriceChart({ priceData, companyName }: PriceChartProps) {
               });
               return `Fecha: ${formatted}`;
             }}
-            contentStyle={{
-              backgroundColor: '#111',
-              border: '1px solid #888',
-              color: 'white',
-            }}
-            labelStyle={{ color: 'white' }}
+            itemStyle={{ color: 'var(--fg)' }}
           />
-          <Line type="monotone" dataKey="close" stroke="#22c55e" strokeWidth={2} dot={false} />
-        </LineChart>
+          <Area type="monotone" dataKey="close" stroke="var(--accent)" strokeWidth={2} fill="url(#priceFill)" dot={false} />
+        </AreaChart>
       </ResponsiveContainer>
-    </div>
+    </section>
   );
 }

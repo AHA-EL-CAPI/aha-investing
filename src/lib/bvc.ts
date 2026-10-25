@@ -158,17 +158,19 @@ export function loadCompany(id: string): CompanyView | null {
     });
   }
 
-  // estados financieros: ultimos 8 trimestres
-  const last8 = c.periods.slice(-8);
-  const off = c.periods.length - last8.length;
-  const statements = Object.entries(c.statements).map(([code, s]) => ({
-    code,
-    title: s.title,
-    periods: last8,
-    rows: s.rows
-      .map((r) => ({ label: r.label, values: r.quarter.slice(off) }))
-      .filter((r) => r.values.some((v) => v !== null)),
-  }));
+  // estados financieros: todo el historial, desde el primer trimestre con alguna cifra
+  const statements = Object.entries(c.statements).map(([code, s]) => {
+    const first = c.periods.findIndex((_, i) => s.rows.some((r) => r.quarter[i] !== null));
+    const off = first < 0 ? 0 : first;
+    return {
+      code,
+      title: s.title,
+      periods: c.periods.slice(off),
+      rows: s.rows
+        .map((r) => ({ label: r.label, values: r.quarter.slice(off) }))
+        .filter((r) => r.values.some((v) => v !== null)),
+    };
+  });
 
   const missing = Object.entries(c.coverage).filter(([p, e]) => p >= '2015-03-31' && e === 'falta').length;
 

@@ -1,15 +1,26 @@
-/* Tailwind solo para /bvc, con prefijo tw: y sin el reset global, para no cambiar el resto del sitio */
+/* Las páginas de /bvc usan clases con prefijo tw:. El reset y la paleta vienen de globals.css. */
 @layer theme, base, utilities;
 @import "tailwindcss/theme.css" layer(theme) prefix(tw);
 @import "tailwindcss/utilities.css" layer(utilities) prefix(tw);
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-grid: var(--grid);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-pos: var(--pos);
+  --color-neg: var(--neg);
+  --font-mono: var(--font-plex-mono), ui-monospace, Menlo, monospace;
+  --font-display: var(--font-bricolage), var(--font-plex-sans), system-ui, sans-serif;
+}
+
 @layer base {
-  .bvc, .bvc *, .bvc ::before, .bvc ::after { box-sizing: border-box; border: 0 solid; margin: 0; padding: 0; }
-  .bvc { font-family: var(--font-geist-sans), system-ui, sans-serif; line-height: 1.5; }
-  .bvc button { font: inherit; color: inherit; background: none; cursor: pointer; }
-  .bvc a { color: inherit; text-decoration: inherit; }
-  .bvc table { border-collapse: collapse; }
-  .bvc h1, .bvc h2 { font-size: inherit; font-weight: inherit; }
+  .bvc { line-height: 1.5; }
 }
