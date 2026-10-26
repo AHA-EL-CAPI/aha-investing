@@ -1,8 +1,135 @@
 /* src/app/globals.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* body {
-  @apply bg-background text-foreground font-sans;
-} */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Paleta de AHA Investing. El sitio arranca siempre en oscuro (ver ThemeProvider); el claro queda listo por si se agrega un botón. */
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --surface-2: #eef1f4;
+  --line: #dde3ea;
+  --grid: #e3e8ee;
+  --fg: #142030;
+  --muted: #5b6878;
+  --accent: #c98a12;
+  --accent-ink: #1a1405;
+  --pos: #1f8f6a;
+  --neg: #d1543f;
+  --bar: #7d93b2;
+  --series-1: #3f74d6;
+  --series-2: #c98a12;
+  --series-3: #1f8f6a;
+  --series-4: #8a5cd6;
+}
+.dark {
+  --bg: #0d141f;
+  --surface: #141d2b;
+  --surface-2: #1b2636;
+  --line: #263345;
+  --grid: #1f2a3a;
+  --fg: #e7ecf2;
+  --muted: #8e9bad;
+  --accent: #e8b23a;
+  --accent-ink: #1a1405;
+  --pos: #3cc497;
+  --neg: #f07a64;
+  --bar: #4f6688;
+  --series-1: #6d9cf0;
+  --series-2: #e8b23a;
+  --series-3: #3cc497;
+  --series-4: #b18cf2;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-grid: var(--grid);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-pos: var(--pos);
+  --color-neg: var(--neg);
+  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-plex-sans), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, Menlo, monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  text-wrap: balance;
+}
+
+/* Recharts: textos de ejes y tooltip con la paleta */
+.recharts-cartesian-axis-tick-value {
+  fill: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.recharts-legend-item-text {
+  color: var(--muted) !important;
+  font-size: 13px;
+}
+.recharts-default-tooltip {
+  background: var(--surface-2) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.recharts-tooltip-label {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+/* Portada: cuadrícula tenue detrás de la presentación */
+.hero-grid {
+  background-image:
+    linear-gradient(to right, var(--grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 30%, transparent 75%);
+  opacity: 0.6;
+}
+
+/* Portada: cinta de precios que se desplaza sola (quieta si el visitante pide menos movimiento) */
+.marquee {
+  animation: marquee 60s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(calc(-50% - 1rem));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    animation: none;
+  }
+}
+
+/* Portada: el logo de YouTube flota suave sobre la mano */
+.yt-float {
+  animation: yt-float 3s ease-in-out infinite;
+}
+@keyframes yt-float {
+  50% {
+    translate: 0 -6%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .yt-float {
+    animation: none;
+  }
+}

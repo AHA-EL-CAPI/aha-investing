@@ -158,17 +158,19 @@ export function loadCompany(id: string): CompanyView | null {
     });
   }
 
-  // estados financieros: ultimos 8 trimestres
-  const last8 = c.periods.slice(-8);
-  const off = c.periods.length - last8.length;
-  const statements = Object.entries(c.statements).map(([code, s]) => ({
-    code,
-    title: s.title,
-    periods: last8,
-    rows: s.rows
-      .map((r) => ({ label: r.label, values: r.quarter.slice(off) }))
-      .filter((r) => r.values.some((v) => v !== null)),
-  }));
+  // estados financieros: todo el historial, desde el primer trimestre con alguna cifra
+  const statements = Object.entries(c.statements).map(([code, s]) => {
+    const first = c.periods.findIndex((_, i) => s.rows.some((r) => r.quarter[i] !== null));
+    const off = first < 0 ? 0 : first;
+    return {
+      code,
+      title: s.title,
+      periods: c.periods.slice(off),
+      rows: s.rows
+        .map((r) => ({ label: r.label, values: r.quarter.slice(off) }))
+        .filter((r) => r.values.some((v) => v !== null)),
+    };
+  });
 
   const missing = Object.entries(c.coverage).filter(([p, e]) => p >= '2015-03-31' && e === 'falta').length;
 
@@ -221,4 +223,18 @@ function weekKey(d: string): string {
   const monday = new Date(t);
   monday.setUTCDate(t.getUTCDate() - ((t.getUTCDay() + 6) % 7));
   return monday.toISOString().slice(0, 10);
+}
+
+// Precios del último año de cada emisor para la portada (minigráfica y variación a 12 meses)
+export function loadPriceTrail(id: string): { date: string; close: number }[] {
+  const c = readJson<CompanyFile>(`${id}.json`);
+  if (!c.prices || c.prices.date.length === 0) return [];
+  const last = c.prices.date[c.prices.date.length - 1];
+  const from = `${Number(last.slice(0, 4)) - 1}${last.slice(4)}`;
+  const out: { date: string; close: number }[] = [];
+  c.prices.date.forEach((d, i) => {
+    const v = c.prices!.close[i];
+    if (d >= from && v !== null) out.push({ date: d, close: v });
+  });
+  return out;
 }

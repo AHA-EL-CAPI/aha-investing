@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Bar,
   BarChart,
@@ -19,23 +19,23 @@ import { cop, copShort, pct, price, quarterLabel, times } from '@/lib/bvcFormat'
 import { GLOSARIO } from '../glosario';
 import EstadosPdf from './EstadosPdf';
 
-const AXIS = { fill: '#9ca3af', fontSize: 12 };
-const GRID = '#9ca3af33';
+// Colores de la paleta del sitio (globals.css); los textos de ejes y tooltip se estilan allí
+const AXIS = { fontSize: 11 };
+const GRID = 'var(--grid)';
 const TOOLTIP = {
-  contentStyle: { backgroundColor: '#111', border: '1px solid #555', color: 'white' },
-  labelStyle: { color: 'white', fontWeight: 'bold' },
-  itemStyle: { color: 'white' },
+  itemStyle: { color: 'var(--fg)' },
+  cursor: { fill: 'var(--surface-2)' },
 };
-const GREEN = '#22c55e';
-const BLUE = '#3b82f6';
-const AMBER = '#f59e0b';
-const PURPLE = '#a855f7';
+const GREEN = 'var(--series-3)';
+const BLUE = 'var(--series-1)';
+const AMBER = 'var(--series-2)';
+const PURPLE = 'var(--series-4)';
 
 function Card({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <section className="tw:bg-white tw:dark:bg-black tw:p-4 tw:rounded-2xl tw:shadow tw:w-full">
-      <h2 className="tw:text-xl tw:font-bold tw:text-black tw:dark:text-white">{title}</h2>
-      {subtitle && <p className="tw:text-sm tw:text-gray-500 tw:mb-2">{subtitle}</p>}
+    <section className="tw:bg-surface tw:border tw:border-line tw:p-4 tw:sm:p-5 tw:rounded-xl tw:w-full">
+      <h2 className="tw:text-lg tw:font-semibold tw:text-fg">{title}</h2>
+      {subtitle && <p className="tw:text-sm tw:text-muted tw:mb-2">{subtitle}</p>}
       {children}
     </section>
   );
@@ -44,17 +44,17 @@ function Card({ title, subtitle, children }: { title: string; subtitle?: string;
 function Tile({ label, value, note, term }: { label: string; value: string; note?: string; term?: string }) {
   const help = term ? GLOSARIO[term] : undefined;
   return (
-    <div className="tw:bg-white tw:dark:bg-black tw:rounded-2xl tw:shadow tw:p-4" title={help ? `${help.name}: ${help.short}` : undefined}>
-      <div className="tw:text-xs tw:uppercase tw:tracking-wide tw:text-gray-500">
+    <div className="tw:bg-surface tw:border tw:border-line tw:rounded-xl tw:p-4" title={help ? `${help.name}: ${help.short}` : undefined}>
+      <div className="tw:text-xs tw:uppercase tw:tracking-wider tw:text-muted">
         {label}
         {help && (
-          <a href="#glosario" className="tw:ml-1 tw:text-gray-400 tw:no-underline" aria-label={`Qué es ${help.name}`}>
+          <a href="#glosario" className="tw:ml-1 tw:text-muted tw:no-underline" aria-label={`Qué es ${help.name}`}>
             ⓘ
           </a>
         )}
       </div>
-      <div className="tw:text-2xl tw:font-bold tw:text-black tw:dark:text-white tw:tabular-nums">{value}</div>
-      {note && <div className="tw:text-xs tw:text-gray-500 tw:mt-1">{note}</div>}
+      <div className="tw:text-2xl tw:font-semibold tw:font-mono tw:text-fg tw:tabular-nums">{value}</div>
+      {note && <div className="tw:text-xs tw:text-muted tw:mt-1">{note}</div>}
     </div>
   );
 }
@@ -106,6 +106,12 @@ export default function Ficha({ c }: { c: CompanyView }) {
 
   const current = c.statements.find((s) => s.code === stmt);
 
+  // La tabla trae todo el historial; arranca mostrando los trimestres más recientes (a la derecha)
+  const tableRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (tableRef.current) tableRef.current.scrollLeft = tableRef.current.scrollWidth;
+  }, [stmt]);
+
   return (
     <div className="tw:space-y-6">
       <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-3 tw:lg:grid-cols-6 tw:gap-4">
@@ -131,8 +137,8 @@ export default function Ficha({ c }: { c: CompanyView }) {
               onClick={() => setTtm(val as boolean)}
               className={`tw:px-3 tw:py-1 tw:rounded-full tw:text-sm tw:border ${
                 ttm === val
-                  ? 'tw:bg-black tw:text-white tw:border-black tw:dark:bg-white tw:dark:text-black tw:dark:border-white'
-                  : 'tw:border-gray-300 tw:text-gray-600 tw:dark:border-neutral-700 tw:dark:text-gray-300'
+                  ? 'tw:bg-accent tw:text-accent-ink tw:border-accent tw:font-semibold'
+                  : 'tw:border-line tw:text-muted tw:hover:border-accent tw:hover:text-fg'
               }`}
             >
               {label as string}
@@ -150,7 +156,7 @@ export default function Ficha({ c }: { c: CompanyView }) {
             <Bar dataKey="Utilidad" fill={GREEN} radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
-        <p className="tw:text-xs tw:text-gray-500">B = billones de pesos, MM = miles de millones.</p>
+        <p className="tw:text-xs tw:text-muted">B = billones de pesos, MM = miles de millones.</p>
       </Card>
 
       <div className="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-6">
@@ -208,7 +214,7 @@ export default function Ficha({ c }: { c: CompanyView }) {
               <XAxis dataKey="date" tick={AXIS} minTickGap={60} tickFormatter={(d: string) => d.slice(0, 4)} />
               <YAxis tick={AXIS} domain={['auto', 'auto']} tickFormatter={(x: number) => price(x)} width={80} />
               <Tooltip formatter={(val: number) => price(val)} {...TOOLTIP} />
-              <Line dataKey="close" name="Precio" stroke={BLUE} dot={false} connectNulls />
+              <Line dataKey="close" name="Precio" stroke="var(--accent)" strokeWidth={2} dot={false} connectNulls />
             </LineChart>
           </ResponsiveContainer>
         </Card>
@@ -217,7 +223,7 @@ export default function Ficha({ c }: { c: CompanyView }) {
       {c.pdf ? (
         <EstadosPdf pdf={c.pdf} name={c.name} />
       ) : current && (
-        <Card title="Estados financieros" subtitle="Cifras de cada trimestre (el balance es el saldo al cierre)">
+        <Card title="Estados financieros" subtitle={`Cifras de cada trimestre (el balance es el saldo al cierre). ${current.periods.length} trimestres desde ${quarterLabel(current.periods[0])}; desliza a la izquierda para ver los anteriores.`}>
           <div className="tw:flex tw:gap-2 tw:mb-3">
             {c.statements.map((s) => (
               <button
@@ -225,21 +231,21 @@ export default function Ficha({ c }: { c: CompanyView }) {
                 onClick={() => setStmt(s.code)}
                 className={`tw:px-3 tw:py-1 tw:rounded-full tw:text-sm tw:border ${
                   stmt === s.code
-                    ? 'tw:bg-black tw:text-white tw:border-black tw:dark:bg-white tw:dark:text-black tw:dark:border-white'
-                    : 'tw:border-gray-300 tw:text-gray-600 tw:dark:border-neutral-700 tw:dark:text-gray-300'
+                    ? 'tw:bg-accent tw:text-accent-ink tw:border-accent tw:font-semibold'
+                    : 'tw:border-line tw:text-muted tw:hover:border-accent tw:hover:text-fg'
                 }`}
               >
                 {s.title}
               </button>
             ))}
           </div>
-          <div className="tw:overflow-x-auto">
-            <table className="tw:w-full tw:text-sm tw:text-black tw:dark:text-white">
+          <div ref={tableRef} className="tw:overflow-x-auto">
+            <table className="tw:w-full tw:text-sm tw:text-fg">
               <thead>
-                <tr className="tw:bg-gray-200 tw:dark:bg-neutral-800">
-                  <th className="tw:px-3 tw:py-2 tw:text-left">Cuenta</th>
+                <tr className="tw:bg-surface tw:border-b tw:border-line">
+                  <th className="tw:sticky tw:left-0 tw:z-10 tw:bg-surface tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-medium tw:uppercase tw:tracking-wider tw:text-muted">Cuenta</th>
                   {current.periods.map((p) => (
-                    <th key={p} className="tw:px-3 tw:py-2 tw:text-right tw:whitespace-nowrap">
+                    <th key={p} className="tw:px-3 tw:py-2 tw:text-right tw:whitespace-nowrap tw:font-mono tw:text-xs tw:font-medium tw:text-muted">
                       {quarterLabel(p)}
                     </th>
                   ))}
@@ -247,10 +253,10 @@ export default function Ficha({ c }: { c: CompanyView }) {
               </thead>
               <tbody>
                 {current.rows.map((r) => (
-                  <tr key={r.label} className="tw:border-t tw:border-gray-200 tw:dark:border-neutral-800">
-                    <td className="tw:px-3 tw:py-1.5 tw:whitespace-nowrap">{r.label}</td>
+                  <tr key={r.label} className="tw:border-t tw:border-grid">
+                    <td className="tw:sticky tw:left-0 tw:z-10 tw:bg-surface tw:px-3 tw:py-1.5 tw:whitespace-nowrap">{r.label}</td>
                     {r.values.map((x, i) => (
-                      <td key={i} className="tw:px-3 tw:py-1.5 tw:text-right tw:whitespace-nowrap tw:tabular-nums">
+                      <td key={i} className="tw:px-3 tw:py-1.5 tw:text-right tw:whitespace-nowrap tw:tabular-nums tw:font-mono">
                         {x === null ? '—' : r.label.startsWith('UPA') || r.label.startsWith('Acciones') ? price(x) : copShort(x)}
                       </td>
                     ))}
