@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { Breakdown } from '@/lib/bvc';
 import { cop, copShort, pct, quarterLabel } from '@/lib/bvcFormat';
+import { useSeriesToggle } from '@/components/useSeriesToggle';
 
 const AXIS = { fontSize: 11 };
 const GRID = 'var(--grid)';
@@ -74,6 +75,8 @@ function Grafica({ periods, a, financial }: { periods: string[]; a: Breakdown; f
     offered.find(([v]) => v === (stock ? 'quarter' : 'ttm'))?.[0] ?? offered[0]?.[0] ?? 'fy',
   );
   const [share, setShare] = useState<'abs' | 'pct'>('abs');
+  // leyenda clicable: ocultar Colombia o exterior (o una modalidad); el % se recalcula sobre lo visible
+  const series = useSeriesToggle();
   const t = TEXT[a.axis];
 
   const data = useMemo(() => {
@@ -83,14 +86,14 @@ function Grafica({ periods, a, financial }: { periods: string[]; a: Breakdown; f
     periods.forEach((p, i) => {
       const vals = a.members.map((m) => m[field][i]);
       if (vals.every((x) => x === null)) return;
-      const tot = vals.reduce<number>((s, x) => s + (x ?? 0), 0);
+      const tot = vals.reduce<number>((s, x, k) => s + (series.hidden(a.members[k].label) ? 0 : x ?? 0), 0);
       const row: Record<string, string | Num> = { label: view === 'fy' ? p.slice(0, 4) : quarterLabel(p) };
       a.members.forEach((m, k) => (row[m.label] = share === 'pct' ? (tot ? (vals[k] ?? 0) / tot : null) : vals[k]));
       rows.push(row);
       lastIdx = i;
     });
     return { rows, lastIdx };
-  }, [a, periods, view, share]);
+  }, [a, periods, view, share, series]);
 
   // en bancos y holdings financieros la nota usa ingresos brutos: la comparacion con el estado de resultados no aplica
   const verify = !stock && !financial;
@@ -99,7 +102,9 @@ function Grafica({ periods, a, financial }: { periods: string[]; a: Breakdown; f
   const okShare = verify && checked.length ? checked.filter(Boolean).length / checked.length : null;
   // participacion del ultimo periodo para el subtitulo
   const last = data.rows.at(-1);
-  const lastTot = last ? a.members.reduce((s, m) => s + ((share === 'pct' ? null : (last[m.label] as Num)) ?? 0), 0) : 0;
+  const lastTot = last
+    ? a.members.reduce((s, m) => s + ((share === 'pct' || series.hidden(m.label) ? null : (last[m.label] as Num)) ?? 0), 0)
+    : 0;
 
   if (!offered.length) return null;
   return (
@@ -134,9 +139,9 @@ function Grafica({ periods, a, financial }: { periods: string[]; a: Breakdown; f
             tickFormatter={(x: number) => (share === 'pct' ? pct(x, 0) : copShort(x))}
           />
           <Tooltip formatter={(val: number) => (share === 'pct' ? pct(val) : cop(val))} {...TOOLTIP} />
-          <Legend />
+          <Legend {...series.legend} />
           {a.members.map((m, n) => (
-            <Bar key={m.label} dataKey={m.label} stackId="d" fill={COLORS[n % COLORS.length]} />
+            <Bar key={m.label} dataKey={m.label} stackId="d" fill={COLORS[n % COLORS.length]} hide={series.hidden(m.label)} />
           ))}
         </BarChart>
       </ResponsiveContainer>
@@ -150,7 +155,7 @@ function Grafica({ periods, a, financial }: { periods: string[]; a: Breakdown; f
         {okShare !== null && `Cuadra en ${pct(okShare, 0)} de los periodos con datos. `}
         {!stock && financial &&
           'En bancos y holdings financieros esta nota usa ingresos brutos (intereses, comisiones y otros), así que no coincide con la línea de ingresos del estado de resultados: sirve para ver la proporción. '}
-        {stock && last && share === 'abs' && lastTot > 0 && `Cartera total al cierre de ${last.label}: ${cop(lastTot)}. `}
+        {stock && last && share === 'abs' && lastTot > 0 && `Cartera ${a.members.some((m) => series.hidden(m.label)) ? 'visible' : 'total'} al cierre de ${last.label}: ${cop(lastTot)}. `}
         {t.note} B = billones de pesos, MM = miles de millones.
       </p>
     </section>
