@@ -18,6 +18,7 @@ import type { CompanyView } from '@/lib/bvc';
 import { cop, copShort, pct, price, quarterLabel, times } from '@/lib/bvcFormat';
 import { GLOSARIO } from '../terminos';
 import EstadosPdf from './EstadosPdf';
+import { useSeriesToggle } from '@/components/useSeriesToggle';
 
 // Colores de la paleta del sitio (globals.css); los textos de ejes y tooltip se estilan allí
 const AXIS = { fontSize: 11 };
@@ -69,6 +70,7 @@ function median(xs: number[]): number | null {
 export default function Ficha({ c }: { c: CompanyView }) {
   const [ttm, setTtm] = useState(false);
   const [stmt, setStmt] = useState(c.statements[0]?.code ?? 'IS');
+  const [s1, s2, s3] = [useSeriesToggle(), useSeriesToggle(), useSeriesToggle()];
   const v = c.summary.valuation;
   const m = c.summary.metrics;
   const revLabel = c.isBank ? 'Margen neto de intereses' : 'Ingresos';
@@ -151,9 +153,9 @@ export default function Ficha({ c }: { c: CompanyView }) {
             <XAxis dataKey="label" tick={AXIS} minTickGap={20} />
             <YAxis tick={AXIS} tickFormatter={copShort} width={70} />
             <Tooltip formatter={(val: number) => cop(val)} {...TOOLTIP} />
-            <Legend />
-            <Bar dataKey={revLabel} fill={BLUE} radius={[3, 3, 0, 0]} />
-            <Bar dataKey="Utilidad" fill={GREEN} radius={[3, 3, 0, 0]} />
+            <Legend {...s1.legend} />
+            <Bar hide={s1.hidden(revLabel)} dataKey={revLabel} fill={BLUE} radius={[3, 3, 0, 0]} />
+            <Bar hide={s1.hidden('Utilidad')} dataKey="Utilidad" fill={GREEN} radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
         <p className="tw:text-xs tw:text-muted">B = billones de pesos, MM = miles de millones.</p>
@@ -167,11 +169,11 @@ export default function Ficha({ c }: { c: CompanyView }) {
               <XAxis dataKey="label" tick={AXIS} minTickGap={20} />
               <YAxis tick={AXIS} tickFormatter={(x: number) => pct(x, 0)} />
               <Tooltip formatter={(val: number) => pct(val)} {...TOOLTIP} />
-              <Legend />
-              {!c.isBank && <Line dataKey="Margen bruto" stroke={BLUE} dot={false} connectNulls />}
-              {!c.isBank && <Line dataKey="Margen operacional" stroke={AMBER} dot={false} connectNulls />}
-              <Line dataKey="Margen neto" stroke={GREEN} dot={false} connectNulls />
-              <Line dataKey="ROE" stroke={PURPLE} dot={false} connectNulls />
+              <Legend {...s2.legend} />
+              {!c.isBank && <Line hide={s2.hidden('Margen bruto')} dataKey="Margen bruto" stroke={BLUE} dot={false} connectNulls />}
+              {!c.isBank && <Line hide={s2.hidden('Margen operacional')} dataKey="Margen operacional" stroke={AMBER} dot={false} connectNulls />}
+              <Line hide={s2.hidden('Margen neto')} dataKey="Margen neto" stroke={GREEN} dot={false} connectNulls />
+              <Line hide={s2.hidden('ROE')} dataKey="ROE" stroke={PURPLE} dot={false} connectNulls />
             </LineChart>
           </ResponsiveContainer>
         </Card>
@@ -184,11 +186,11 @@ export default function Ficha({ c }: { c: CompanyView }) {
               <YAxis yAxisId="pe" tick={AXIS} tickFormatter={(x: number) => times(x, 0)} />
               <YAxis yAxisId="pb" orientation="right" tick={AXIS} tickFormatter={(x: number) => times(x, 1)} />
               <Tooltip formatter={(val: number) => times(val, 2)} {...TOOLTIP} />
-              <Legend />
-              <Line yAxisId="pe" dataKey="P/E" stroke={BLUE} dot={false} connectNulls />
-              <Line yAxisId="pb" dataKey="P/B" stroke={AMBER} dot={false} connectNulls />
-              {hist.pe && <ReferenceLine yAxisId="pe" y={hist.pe} stroke={BLUE} strokeDasharray="4 4" />}
-              {hist.pb && <ReferenceLine yAxisId="pb" y={hist.pb} stroke={AMBER} strokeDasharray="4 4" />}
+              <Legend {...s3.legend} />
+              <Line hide={s3.hidden('P/E')} yAxisId="pe" dataKey="P/E" stroke={BLUE} dot={false} connectNulls />
+              <Line hide={s3.hidden('P/B')} yAxisId="pb" dataKey="P/B" stroke={AMBER} dot={false} connectNulls />
+              {hist.pe && !s3.hidden('P/E') && <ReferenceLine yAxisId="pe" y={hist.pe} stroke={BLUE} strokeDasharray="4 4" />}
+              {hist.pb && !s3.hidden('P/B') && <ReferenceLine yAxisId="pb" y={hist.pb} stroke={AMBER} strokeDasharray="4 4" />}
             </LineChart>
           </ResponsiveContainer>
         </Card>
