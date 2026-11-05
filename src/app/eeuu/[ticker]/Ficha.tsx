@@ -17,6 +17,7 @@ import {
 import type { SecValuation, SegmentAxis } from '@/lib/sec';
 import { pct, quarterLabel, times, usd, usdPrice, usdShort } from '@/lib/secFormat';
 import { GLOSARIO } from '../terminos';
+import { useSeriesToggle } from '@/components/useSeriesToggle';
 
 type Num = number | null;
 
@@ -112,6 +113,7 @@ export default function Ficha({ d }: { d: FichaData }) {
   const [view, setView] = useState<View>('quarter');
   const [tableView, setTableView] = useState<View>('quarter');
   const [segAxis, setSegAxis] = useState<string>(d.segments[0]?.axis ?? '');
+  const [s1, s2, s3, s4, s5, s6] = [useSeriesToggle(), useSeriesToggle(), useSeriesToggle(), useSeriesToggle(), useSeriesToggle(), useSeriesToggle()];
   const [segView, setSegView] = useState<View>('ttm');
   const v = d.valuation;
   const m = d.metrics;
@@ -288,10 +290,10 @@ export default function Ficha({ d }: { d: FichaData }) {
             <XAxis dataKey="label" tick={AXIS} minTickGap={20} />
             <YAxis tick={AXIS} tickFormatter={usdShort} width={60} />
             <Tooltip formatter={(val: number) => money(val)} {...TOOLTIP} />
-            <Legend />
-            <Bar dataKey="Ingresos" fill={BLUE} radius={[3, 3, 0, 0]} />
-            <Bar dataKey="Utilidad" fill={GREEN} radius={[3, 3, 0, 0]} />
-            {!d.isBank && <Bar dataKey="FCF" fill={AMBER} radius={[3, 3, 0, 0]} />}
+            <Legend {...s1.legend} />
+            <Bar hide={s1.hidden('Ingresos')} dataKey="Ingresos" fill={BLUE} radius={[3, 3, 0, 0]} />
+            <Bar hide={s1.hidden('Utilidad')} dataKey="Utilidad" fill={GREEN} radius={[3, 3, 0, 0]} />
+            {!d.isBank && <Bar hide={s1.hidden('FCF')} dataKey="FCF" fill={AMBER} radius={[3, 3, 0, 0]} />}
           </BarChart>
         </ResponsiveContainer>
         <p className="tw:text-xs tw:text-muted">Miles de millones de {d.currency === 'USD' ? 'dólares' : d.currency}.</p>
@@ -329,9 +331,9 @@ export default function Ficha({ d }: { d: FichaData }) {
                 <XAxis dataKey="label" tick={AXIS} minTickGap={20} />
                 <YAxis tick={AXIS} tickFormatter={usdShort} width={60} />
                 <Tooltip formatter={(val: number) => money(val)} {...TOOLTIP} />
-                <Legend />
+                <Legend {...s2.legend} />
                 {segData.keys.map((k, n) => (
-                  <Bar key={k} dataKey={k} stackId="seg" fill={SEG_COLORS[n % SEG_COLORS.length]} />
+                  <Bar hide={s2.hidden(k)} key={k} dataKey={k} stackId="seg" fill={SEG_COLORS[n % SEG_COLORS.length]} />
                 ))}
               </BarChart>
             </ResponsiveContainer>
@@ -358,9 +360,9 @@ export default function Ficha({ d }: { d: FichaData }) {
               <XAxis dataKey="label" tick={AXIS} minTickGap={20} />
               <YAxis tick={AXIS} />
               <Tooltip formatter={(val: number) => usdPrice(val).replace('US$', cur)} {...TOOLTIP} />
-              <Legend />
-              <Line dataKey="EPS (12 meses)" stroke={BLUE} dot={false} connectNulls />
-              {!d.isBank && <Line dataKey="FCF por acción (12 meses)" stroke={GREEN} dot={false} connectNulls />}
+              <Legend {...s3.legend} />
+              <Line hide={s3.hidden('EPS (12 meses)')} dataKey="EPS (12 meses)" stroke={BLUE} dot={false} connectNulls />
+              {!d.isBank && <Line hide={s3.hidden('FCF por acción (12 meses)')} dataKey="FCF por acción (12 meses)" stroke={GREEN} dot={false} connectNulls />}
             </LineChart>
           </ResponsiveContainer>
         </Card>
@@ -372,11 +374,11 @@ export default function Ficha({ d }: { d: FichaData }) {
               <XAxis dataKey="label" tick={AXIS} minTickGap={20} />
               <YAxis tick={AXIS} tickFormatter={(x: number) => pct(x, 0)} />
               <Tooltip formatter={(val: number) => pct(val)} {...TOOLTIP} />
-              <Legend />
-              {!d.isBank && <Line dataKey="Margen bruto" stroke={BLUE} dot={false} connectNulls />}
-              {!d.isBank && <Line dataKey="Margen operacional" stroke={AMBER} dot={false} connectNulls />}
-              <Line dataKey="Margen neto" stroke={GREEN} dot={false} connectNulls />
-              {!d.isBank && <Line dataKey="Margen FCF" stroke={PURPLE} dot={false} connectNulls />}
+              <Legend {...s4.legend} />
+              {!d.isBank && <Line hide={s4.hidden('Margen bruto')} dataKey="Margen bruto" stroke={BLUE} dot={false} connectNulls />}
+              {!d.isBank && <Line hide={s4.hidden('Margen operacional')} dataKey="Margen operacional" stroke={AMBER} dot={false} connectNulls />}
+              <Line hide={s4.hidden('Margen neto')} dataKey="Margen neto" stroke={GREEN} dot={false} connectNulls />
+              {!d.isBank && <Line hide={s4.hidden('Margen FCF')} dataKey="Margen FCF" stroke={PURPLE} dot={false} connectNulls />}
             </LineChart>
           </ResponsiveContainer>
         </Card>
@@ -388,9 +390,9 @@ export default function Ficha({ d }: { d: FichaData }) {
               <XAxis dataKey="label" tick={AXIS} minTickGap={20} />
               <YAxis tick={AXIS} tickFormatter={(x: number) => pct(x, 0)} />
               <Tooltip formatter={(val: number) => pct(val)} {...TOOLTIP} />
-              <Legend />
-              <Line dataKey="ROE" stroke={PURPLE} dot={false} connectNulls />
-              {!d.isBank && <Line dataKey="ROIC" stroke={BLUE} dot={false} connectNulls />}
+              <Legend {...s5.legend} />
+              <Line hide={s5.hidden('ROE')} dataKey="ROE" stroke={PURPLE} dot={false} connectNulls />
+              {!d.isBank && <Line hide={s5.hidden('ROIC')} dataKey="ROIC" stroke={BLUE} dot={false} connectNulls />}
             </LineChart>
           </ResponsiveContainer>
         </Card>
@@ -403,11 +405,11 @@ export default function Ficha({ d }: { d: FichaData }) {
                 <XAxis dataKey="date" tick={AXIS} minTickGap={60} tickFormatter={(x: string) => x.slice(0, 7)} />
                 <YAxis tick={AXIS} tickFormatter={(x: number) => times(x, 0)} />
                 <Tooltip formatter={(val: number) => times(val)} {...TOOLTIP} />
-                <Legend />
-                <Line dataKey="P/E" stroke={BLUE} dot={false} connectNulls />
-                {!d.isBank && <Line dataKey="P/FCF" stroke={GREEN} dot={false} connectNulls />}
-                {hist.pe && <ReferenceLine y={hist.pe} stroke={BLUE} strokeDasharray="4 4" />}
-                {!d.isBank && hist.pfcf && <ReferenceLine y={hist.pfcf} stroke={GREEN} strokeDasharray="4 4" />}
+                <Legend {...s6.legend} />
+                <Line hide={s6.hidden('P/E')} dataKey="P/E" stroke={BLUE} dot={false} connectNulls />
+                {!d.isBank && <Line hide={s6.hidden('P/FCF')} dataKey="P/FCF" stroke={GREEN} dot={false} connectNulls />}
+                {hist.pe && !s6.hidden('P/E') && <ReferenceLine y={hist.pe} stroke={BLUE} strokeDasharray="4 4" />}
+                {!d.isBank && hist.pfcf && !s6.hidden('P/FCF') && <ReferenceLine y={hist.pfcf} stroke={GREEN} strokeDasharray="4 4" />}
               </LineChart>
             </ResponsiveContainer>
           </Card>
