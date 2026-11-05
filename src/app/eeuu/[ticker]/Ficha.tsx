@@ -14,7 +14,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import type { SecValuation } from '@/lib/sec';
+import type { SecValuation, SegmentAxis } from '@/lib/sec';
 import { pct, quarterLabel, times, usd, usdPrice, usdShort } from '@/lib/secFormat';
 import { GLOSARIO } from '../terminos';
 
@@ -36,7 +36,12 @@ export type FichaData = {
   valuation: SecValuation;
   metrics: Record<string, Num>;
   lastPeriod: string;
+  segments: SegmentAxis[];
+  filingUrl: (string | null)[];
+  filingForm: (string | null)[];
 };
+
+const SEG_COLORS = ['var(--series-1)', 'var(--series-2)', 'var(--series-3)', 'var(--series-4)', '#e879f9', '#22d3ee', '#f87171', '#a3e635'];
 
 const AXIS = { fontSize: 11 };
 const GRID = 'var(--grid)';
@@ -106,6 +111,8 @@ type View = 'quarter' | 'ttm' | 'fy';
 export default function Ficha({ d }: { d: FichaData }) {
   const [view, setView] = useState<View>('quarter');
   const [tableView, setTableView] = useState<View>('quarter');
+  const [segAxis, setSegAxis] = useState<string>(d.segments[0]?.axis ?? '');
+  const [segView, setSegView] = useState<View>('ttm');
   const v = d.valuation;
   const m = d.metrics;
   const cur = d.currency === 'USD' ? 'US$' : `${d.currency} `;
@@ -207,6 +214,34 @@ export default function Ficha({ d }: { d: FichaData }) {
   const fmtCell = (x: Num, kind: string) =>
     x === null ? '—' : kind === 'ps' ? usdPrice(x).replace('US$', '') : kind === 'shares' ? `${(x / 1e9).toLocaleString('es-CO', { maximumFractionDigits: 3 })}` : usdShort(x);
 
+  // ingresos por segmento: los 7 miembros mas grandes y "Otros"; los subtotales no se apilan
+  const seg = d.segments.find((x) => x.axis === segAxis);
+  const segData = useMemo(() => {
+    if (!seg) return { rows: [] as Record<string, string | number | null>[], keys: [] as string[], lastIdx: -1 };
+    const parts = seg.members.filter((mm) => !mm.subtotal);
+    const field = segView === 'quarter' ? 'quarter' : segView === 'ttm' ? 'ttm' : 'annual';
+    const top = parts.slice(0, 7);
+    const rest = parts.slice(7);
+    const keys = [...top.map((mm) => mm.label), ...(rest.length ? ['Otros'] : [])];
+    const rows: Record<string, string | number | null>[] = [];
+    let lastIdx = -1;
+    d.periods.forEach((p, i) => {
+      if (segView === 'fy' && !d.isFy[i]) return;
+      const vals = top.map((mm) => mm[field][i]);
+      const other = rest.reduce<number | null>((acc, mm) => (mm[field][i] == null ? acc : (acc ?? 0) + (mm[field][i] as number)), null);
+      if (vals.every((x) => x == null) && other == null) return;
+      const row: Record<string, string | number | null> = { label: segView === 'fy' ? d.fiscal[i].split(' ')[1] : quarterLabel(p) };
+      top.forEach((mm, k) => (row[mm.label] = vals[k]));
+      if (rest.length) row.Otros = other;
+      rows.push(row);
+      lastIdx = i;
+    });
+    return { rows, keys, lastIdx };
+  }, [seg, segView, d.periods, d.isFy, d.fiscal]);
+  const segCheck = seg && segData.lastIdx >= 0 ? { ok: seg.ok[segData.lastIdx], diff: seg.diff[segData.lastIdx] } : null;
+  const segChecked = seg ? seg.ok.filter((x) => x !== null) : [];
+  const segOkShare = segChecked.length ? segChecked.filter(Boolean).length / segChecked.length : null;
+
   return (
     <div className="tw:space-y-6">
       <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-3 tw:lg:grid-cols-6 tw:gap-4">
@@ -261,6 +296,59 @@ export default function Ficha({ d }: { d: FichaData }) {
         </ResponsiveContainer>
         <p className="tw:text-xs tw:text-muted">Miles de millones de {d.currency === 'USD' ? 'dólares' : d.currency}.</p>
       </Card>
+
+      {seg && (
+        <Card
+          title="¿De dónde vienen los ingresos?"
+          subtitle="Desglose que la empresa reporta en las notas de sus 10-Q y 10-K, leído directamente del XBRL de cada informe."
+        >
+          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-x-4">
+            <Toggle<string>
+              value={segAxis}
+              onChange={setSegAxis}
+              options={d.segments.map((x) => [x.axis, x.title] as [string, string])}
+            />
+            <Toggle<View>
+              value={segView}
+              onChange={setSegView}
+              options={[
+                ['quarter', 'Trimestre'],
+                ['ttm', '12 meses'],
+                ['fy', 'Año fiscal'],
+              ]}
+            />
+          </div>
+          {segData.rows.length === 0 ? (
+            <p className="tw:text-sm tw:text-muted tw:py-6">
+              Esta empresa publica este desglose solo en su informe anual: elige «Año fiscal».
+            </p>
+          ) : (
+            <ResponsiveContainer width="100%" height={340}>
+              <BarChart data={segData.rows} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+                <CartesianGrid stroke={GRID} vertical={false} />
+                <XAxis dataKey="label" tick={AXIS} minTickGap={20} />
+                <YAxis tick={AXIS} tickFormatter={usdShort} width={60} />
+                <Tooltip formatter={(val: number) => money(val)} {...TOOLTIP} />
+                <Legend />
+                {segData.keys.map((k, n) => (
+                  <Bar key={k} dataKey={k} stackId="seg" fill={SEG_COLORS[n % SEG_COLORS.length]} />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+          <p className="tw:text-xs tw:text-muted tw:mt-1">
+            {segCheck?.ok === true && <span className="tw:text-pos tw:font-semibold">✓ Verificado: </span>}
+            {segCheck?.ok === false && <span className="tw:text-neg tw:font-semibold">⚠ No cuadra: </span>}
+            {segCheck?.ok != null &&
+              (segCheck.ok
+                ? 'en el último periodo las partes suman los ingresos totales del estado de resultados. '
+                : `en el último periodo las partes difieren ${pct(segCheck.diff, 1)} de los ingresos totales (la empresa no desglosa todo). `)}
+            {segOkShare !== null && `Cuadra en ${pct(segOkShare, 0)} de los periodos con datos. `}
+            Miles de millones de {d.currency === 'USD' ? 'dólares' : d.currency}. Las cifras históricas usan la versión
+            más reciente que publicó la empresa (los segmentos a veces se reclasifican).
+          </p>
+        </Card>
+      )}
 
       <div className="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-6">
         <Card title="Por acción" subtitle="Últimos 12 meses, ajustado por splits">
@@ -342,7 +430,7 @@ export default function Ficha({ d }: { d: FichaData }) {
 
       <Card
         title="Cifras clave"
-        subtitle={`Miles de millones de ${d.currency === 'USD' ? 'dólares' : d.currency}; por acción en ${d.currency === 'USD' ? 'dólares' : d.currency}; acciones en miles de millones. Debajo de cada cifra, el crecimiento ${tableView === 'fy' ? 'frente al año anterior' : 'frente al mismo periodo del año anterior'}. Desliza a la izquierda para ver la historia.`}
+        subtitle={`Miles de millones de ${d.currency === 'USD' ? 'dólares' : d.currency}; por acción en ${d.currency === 'USD' ? 'dólares' : d.currency}; acciones en miles de millones. Debajo de cada cifra, el crecimiento ${tableView === 'fy' ? 'frente al año anterior' : 'frente al mismo periodo del año anterior'}. Desliza a la izquierda para ver la historia. Haz clic en 10-Q / 10-K para abrir el informe original y verificar cada cifra.`}
       >
         <Toggle<View>
           value={tableView}
@@ -360,7 +448,18 @@ export default function Ficha({ d }: { d: FichaData }) {
                 <th className="tw:sticky tw:left-0 tw:z-10 tw:bg-surface tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-medium tw:uppercase tw:tracking-wider tw:text-muted">Cuenta</th>
                 {tIdx.map((i) => (
                   <th key={i} className="tw:px-3 tw:py-2 tw:text-right tw:whitespace-nowrap tw:font-mono tw:text-xs tw:font-medium tw:text-muted">
-                    {tableView === 'fy' ? d.fiscal[i].split(' ')[1] : d.fiscal[i]}
+                    <div>{tableView === 'fy' ? d.fiscal[i].split(' ')[1] : d.fiscal[i]}</div>
+                    {d.filingUrl[i] && (
+                      <a
+                        href={d.filingUrl[i]!}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="tw:text-accent tw:normal-case tw:hover:underline"
+                        title="Abre el informe original en el visor de la SEC"
+                      >
+                        {d.filingForm[i] ?? 'informe'} ↗
+                      </a>
+                    )}
                   </th>
                 ))}
               </tr>

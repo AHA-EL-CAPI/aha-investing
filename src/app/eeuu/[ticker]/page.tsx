@@ -51,6 +51,14 @@ export default async function Page({ params }: Params) {
     valuation: c.valuation,
     metrics: summary.metrics,
     lastPeriod: summary.last_period,
+    segments: (c.segments ?? []).map((ax) => ({
+      ...ax,
+      members: ax.members.map((mm) => ({ ...mm, quarter: sl(mm.quarter), annual: sl(mm.annual), ttm: sl(mm.ttm) })),
+      ok: sl(ax.ok),
+      diff: sl(ax.diff),
+    })),
+    filingUrl: sl(c.filing_url ?? c.periods.map(() => null)),
+    filingForm: sl(c.filing_form ?? c.periods.map(() => null)),
   };
 
   return (

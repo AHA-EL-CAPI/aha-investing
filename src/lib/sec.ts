@@ -56,6 +56,19 @@ export type SecCompany = {
   multiples: { date: string[]; pe: Num[]; p_fcf: Num[] };
   valuation: SecValuation;
   dcf: Dcf;
+  segments?: SegmentAxis[];
+  filing_url?: (string | null)[];
+  filing_form?: (string | null)[];
+};
+
+// Ingresos por segmento / producto / pais (cifras con dimension del XBRL de cada informe), alineados con periods.
+// ok/diff: si los miembros suman los ingresos totales de ese trimestre (tolerancia 1 %)
+export type SegmentAxis = {
+  axis: 'segmento' | 'producto' | 'geografia';
+  title: string;
+  members: { label: string; subtotal: boolean; quarter: Num[]; annual: Num[]; ttm: Num[] }[];
+  ok: (boolean | null)[];
+  diff: Num[];
 };
 
 const DIR = path.join(process.cwd(), 'src', 'data', 'sec');
