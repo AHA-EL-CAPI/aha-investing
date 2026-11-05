@@ -1,4 +1,4 @@
-import { GLOSARIO } from './glosario';
+import { GLOSARIO } from './terminos';
 
 export default function Glosario({ keys = Object.keys(GLOSARIO) }: { keys?: string[] }) {
   return (

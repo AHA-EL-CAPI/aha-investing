@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { CompanySummary } from '@/lib/bvc';
 import { cop, pct, price, quarterLabel, sectorName, times } from '@/lib/bvcFormat';
-import { GLOSARIO } from './glosario';
+import { GLOSARIO } from './terminos';
 
 type Col = {
   key: string;

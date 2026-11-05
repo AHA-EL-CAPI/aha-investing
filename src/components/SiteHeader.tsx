@@ -13,6 +13,10 @@ export function SiteHeader() {
             <span className="sm:hidden">Colombia</span>
             <span className="hidden sm:inline">Acciones colombianas</span>
           </Link>
+          <Link href="/eeuu" className="hover:text-fg">
+            <span className="sm:hidden">EE. UU.</span>
+            <span className="hidden sm:inline">Acciones de EE. UU.</span>
+          </Link>
           <Link href="/#internacionales" className="hover:text-fg">
             Internacionales
           </Link>

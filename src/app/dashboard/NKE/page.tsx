@@ -1,27 +1,5 @@
-import { StockDashboard } from '@/components/StockDashboard';
-
-import { stockData } from '@/data/NKE/Data';
-import { valuationTable } from '@/data/NKE/ValuationData';
-import { priceHistory } from '@/data/NKE/price-history';
-
-const last = stockData[stockData.length - 1];
+import { SecStockDashboard } from '@/components/SecStockDashboard';
 
 export default function Page() {
-  return (
-    <StockDashboard
-      name="Nike"
-      ticker="NKE"
-      currency="USD"
-      data={stockData}
-      divisor={1}
-      valuationTable={valuationTable}
-      priceHistory={priceHistory}
-      metrics={[
-        { title: 'Ingresos Trimestrales', dataKey: 'Quarter_Revenue', yoy: last?.QY_on_QY_Revenue_growth },
-        { title: 'Efectivo Neto Operacional', dataKey: 'Quarter_Op_Cash', yoy: last?.QY_on_QY_Op_Cash_growth },
-        { title: 'CAPEX', dataKey: 'Quarter_CAPEX', yoy: last?.QY_on_QY_Capex_growth },
-        { title: 'FCF', dataKey: 'Quarter_FCF', yoy: last?.QY_on_QY_FCF_growth },
-      ]}
-    />
-  );
+  return <SecStockDashboard ticker="NKE" name="Nike" />;
 }
