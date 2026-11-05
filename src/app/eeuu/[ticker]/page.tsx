@@ -51,7 +51,10 @@ export default async function Page({ params }: Params) {
     valuation: c.valuation,
     metrics: summary.metrics,
     lastPeriod: summary.last_period,
-    segments: (c.segments ?? []).map((ax) => ({
+    // un eje con una sola parte (MA: 'Payment Solutions' = todo) no es un desglose
+    segments: (c.segments ?? [])
+      .filter((ax) => new Set(ax.members.filter((mm) => !mm.subtotal).map((mm) => mm.label.trim().toLowerCase())).size > 1)
+      .map((ax) => ({
       ...ax,
       members: ax.members.map((mm) => ({ ...mm, quarter: sl(mm.quarter), annual: sl(mm.annual), ttm: sl(mm.ttm) })),
       ok: sl(ax.ok),
