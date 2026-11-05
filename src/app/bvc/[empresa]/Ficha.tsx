@@ -16,7 +16,7 @@ import {
 } from 'recharts';
 import type { CompanyView } from '@/lib/bvc';
 import { cop, copShort, pct, price, quarterLabel, times } from '@/lib/bvcFormat';
-import { GLOSARIO } from '../glosario';
+import { GLOSARIO } from '../terminos';
 import EstadosPdf from './EstadosPdf';
 
 // Colores de la paleta del sitio (globals.css); los textos de ejes y tooltip se estilan allí
