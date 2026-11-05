@@ -220,8 +220,31 @@ export default function Ficha({ d }: { d: FichaData }) {
   const seg = d.segments.find((x) => x.axis === segAxis);
   const segData = useMemo(() => {
     if (!seg) return { rows: [] as Record<string, string | number | null>[], keys: [] as string[], lastIdx: -1 };
-    const parts = seg.members.filter((mm) => !mm.subtotal);
+    // un miembro que cambio de nombre XBRL (p. ej. us-gaap: -> srt: en 2018) puede llegar dos veces con la misma
+    // etiqueta: se une en una sola serie (gana la primera, la mas grande hoy); si no, Recharts las cruza por dataKey
+    const byLabel = new Map<string, SegmentAxis['members'][number]>();
+    for (const mm of seg.members.filter((x) => !x.subtotal)) {
+      const k = mm.label.trim().toLowerCase();
+      const prev = byLabel.get(k);
+      if (!prev) {
+        byLabel.set(k, mm);
+        continue;
+      }
+      const join = (a: Num[], b: Num[]) => a.map((x, i) => (x ?? b[i] ?? null));
+      byLabel.set(k, { ...prev, quarter: join(prev.quarter, mm.quarter), annual: join(prev.annual, mm.annual), ttm: join(prev.ttm, mm.ttm) });
+    }
     const field = segView === 'quarter' ? 'quarter' : segView === 'ttm' ? 'ttm' : 'annual';
+    // las 7 partes mas grandes del periodo mas reciente de esta vista (un desglose nuevo no queda en "Otros")
+    const latest = (mm: SegmentAxis['members'][number]) => {
+      const a = mm[field];
+      for (let i = a.length - 1; i >= 0; i--) if (a[i] != null) return [i, Math.abs(a[i] as number)];
+      return [-1, 0];
+    };
+    const parts = [...byLabel.values()].sort((a, b) => {
+      const [ia, va] = latest(a);
+      const [ib, vb] = latest(b);
+      return ib - ia || vb - va;
+    });
     const top = parts.slice(0, 7);
     const rest = parts.slice(7);
     const keys = [...top.map((mm) => mm.label), ...(rest.length ? ['Otros'] : [])];
@@ -232,6 +255,11 @@ export default function Ficha({ d }: { d: FichaData }) {
       const vals = top.map((mm) => mm[field][i]);
       const other = rest.reduce<number | null>((acc, mm) => (mm[field][i] == null ? acc : (acc ?? 0) + (mm[field][i] as number)), null);
       if (vals.every((x) => x == null) && other == null) return;
+      // periodos en que la empresa solo desglosó una parte (o el desglose no cuadra): no se dibujan para no
+      // mostrar barras que no corresponden a los ingresos del periodo
+      const tot = (segView === 'quarter' ? d.quarter : segView === 'ttm' ? d.ttm : d.fy).revenue?.[i];
+      const sum = vals.reduce<number>((a, x) => a + (x ?? 0), 0) + (other ?? 0);
+      if (tot && (sum < 0.5 * tot || sum > 1.5 * tot)) return;
       const row: Record<string, string | number | null> = { label: segView === 'fy' ? d.fiscal[i].split(' ')[1] : quarterLabel(p) };
       top.forEach((mm, k) => (row[mm.label] = vals[k]));
       if (rest.length) row.Otros = other;
@@ -239,7 +267,7 @@ export default function Ficha({ d }: { d: FichaData }) {
       lastIdx = i;
     });
     return { rows, keys, lastIdx };
-  }, [seg, segView, d.periods, d.isFy, d.fiscal]);
+  }, [seg, segView, d.periods, d.isFy, d.fiscal, d.quarter, d.ttm, d.fy]);
   const segCheck = seg && segData.lastIdx >= 0 ? { ok: seg.ok[segData.lastIdx], diff: seg.diff[segData.lastIdx] } : null;
   const segChecked = seg ? seg.ok.filter((x) => x !== null) : [];
   const segOkShare = segChecked.length ? segChecked.filter(Boolean).length / segChecked.length : null;
@@ -326,7 +354,7 @@ export default function Ficha({ d }: { d: FichaData }) {
             </p>
           ) : (
             <ResponsiveContainer width="100%" height={340}>
-              <BarChart data={segData.rows} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+              <BarChart data={segData.rows} stackOffset="sign" margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
                 <CartesianGrid stroke={GRID} vertical={false} />
                 <XAxis dataKey="label" tick={AXIS} minTickGap={20} />
                 <YAxis tick={AXIS} tickFormatter={usdShort} width={60} />
