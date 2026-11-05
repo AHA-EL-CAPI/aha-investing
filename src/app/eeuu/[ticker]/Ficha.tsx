@@ -220,7 +220,20 @@ export default function Ficha({ d }: { d: FichaData }) {
   const seg = d.segments.find((x) => x.axis === segAxis);
   const segData = useMemo(() => {
     if (!seg) return { rows: [] as Record<string, string | number | null>[], keys: [] as string[], lastIdx: -1 };
-    const parts = seg.members.filter((mm) => !mm.subtotal);
+    // un miembro que cambio de nombre XBRL (p. ej. us-gaap: -> srt: en 2018) puede llegar dos veces con la misma
+    // etiqueta: se une en una sola serie (gana la primera, la mas grande hoy); si no, Recharts las cruza por dataKey
+    const byLabel = new Map<string, SegmentAxis['members'][number]>();
+    for (const mm of seg.members.filter((x) => !x.subtotal)) {
+      const k = mm.label.trim().toLowerCase();
+      const prev = byLabel.get(k);
+      if (!prev) {
+        byLabel.set(k, mm);
+        continue;
+      }
+      const join = (a: Num[], b: Num[]) => a.map((x, i) => (x ?? b[i] ?? null));
+      byLabel.set(k, { ...prev, quarter: join(prev.quarter, mm.quarter), annual: join(prev.annual, mm.annual), ttm: join(prev.ttm, mm.ttm) });
+    }
+    const parts = [...byLabel.values()];
     const field = segView === 'quarter' ? 'quarter' : segView === 'ttm' ? 'ttm' : 'annual';
     const top = parts.slice(0, 7);
     const rest = parts.slice(7);
