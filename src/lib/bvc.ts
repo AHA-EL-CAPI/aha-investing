@@ -58,8 +58,21 @@ type CompanyFile = {
   prices?: { date: string[]; close: Num[]; pe: Num[]; pb: Num[]; dividend_yield: Num[]; market_cap: Num[] };
   metric_defs: MetricDef[];
   pdf?: PdfFile;
+  breakdowns?: Breakdown[];
   news?: NewsItem[];
   simev_url?: string;
+};
+
+// Desgloses leidos de las cifras con dimension del XBRL (bvc-fundamentales/bvc/desglose.py), alineados con periods:
+// geografia = ingresos en Colombia vs. exterior (flujo); cartera = cartera de credito por modalidad (saldo al cierre).
+// ok/diff: si las partes suman los ingresos del estado de resultados de ese periodo (tolerancia 5 %)
+export type Breakdown = {
+  axis: 'geografia' | 'cartera';
+  title: string;
+  kind: 'flow' | 'stock';
+  members: { label: string; subtotal: boolean; quarter: Num[]; annual: Num[]; ttm: Num[] }[];
+  ok: (boolean | null)[];
+  diff: Num[];
 };
 
 // Informacion relevante publicada en SIMEV (bvc-fundamentales/bvc/inforel.py)
@@ -88,6 +101,7 @@ export type CompanyView = {
   prices: { date: string; close: Num; pe: Num; pb: Num; dy: Num }[];
   statements: { code: string; title: string; periods: string[]; rows: { label: string; values: Num[] }[] }[];
   pdf: { periods: string[]; statements: PdfStatement[] } | null;
+  breakdowns: { periods: string[]; axes: Breakdown[] };
   news: NewsItem[];
   simevUrl: string | null;
   missing: number;
@@ -185,12 +199,27 @@ export function loadCompany(id: string): CompanyView | null {
     prices,
     statements,
     pdf: pdfStatements(c.pdf),
+    breakdowns: sliceBreakdowns(c.periods, c.breakdowns ?? [], idx),
     news: c.news ?? [],
     simevUrl: c.simev_url ?? null,
     missing,
     lastPeriod: summary.last_period,
     summary,
     metricDefs: index.metric_defs,
+  };
+}
+
+// desgloses en los mismos trimestres de la ficha (desde 2015)
+function sliceBreakdowns(periods: string[], axes: Breakdown[], idx: number[]): CompanyView['breakdowns'] {
+  const pick = <T,>(xs: T[]) => idx.map((i) => xs[i] ?? (null as T));
+  return {
+    periods: pick(periods),
+    axes: axes.map((a) => ({
+      ...a,
+      members: a.members.map((m) => ({ ...m, quarter: pick(m.quarter), annual: pick(m.annual), ttm: pick(m.ttm) })),
+      ok: pick(a.ok),
+      diff: pick(a.diff),
+    })),
   };
 }
 

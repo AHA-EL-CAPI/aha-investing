@@ -17,6 +17,7 @@ import {
 import type { CompanyView } from '@/lib/bvc';
 import { cop, copShort, pct, price, quarterLabel, times } from '@/lib/bvcFormat';
 import { GLOSARIO } from '../terminos';
+import Desglose from './Desglose';
 import EstadosPdf from './EstadosPdf';
 
 // Colores de la paleta del sitio (globals.css); los textos de ejes y tooltip se estilan allí
@@ -158,6 +159,12 @@ export default function Ficha({ c }: { c: CompanyView }) {
         </ResponsiveContainer>
         <p className="tw:text-xs tw:text-muted">B = billones de pesos, MM = miles de millones.</p>
       </Card>
+
+      <Desglose
+        periods={c.breakdowns.periods}
+        axes={c.breakdowns.axes}
+        financial={['banca', 'holding_financiero', 'servicios_financieros'].includes(c.sector)}
+      />
 
       <div className="tw:grid tw:grid-cols-1 tw:lg:grid-cols-2 tw:gap-6">
         <Card title={c.isBank ? 'Rentabilidad' : 'Márgenes y rentabilidad'} subtitle="Últimos 12 meses">
