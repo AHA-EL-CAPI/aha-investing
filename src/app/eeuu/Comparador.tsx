@@ -130,6 +130,14 @@ export default function Comparador({ companies }: { companies: SecSummary[] }) {
                 </td>
                 <td className="tw:px-3 tw:py-2.5 tw:whitespace-nowrap tw:font-mono tw:text-muted">
                   {fiscalLabel(c.fiscal_year, c.fiscal_quarter)}
+                  {c.preliminary && (
+                    <span
+                      className="tw:ml-1.5 tw:px-1.5 tw:py-0.5 tw:rounded tw:text-[10px] tw:font-sans tw:font-semibold tw:border tw:border-accent tw:text-accent"
+                      title={`Cifras del comunicado de resultados (${c.preliminary.form} del ${c.preliminary.filed}); se reemplazan solas cuando llegue el informe oficial`}
+                    >
+                      {c.preliminary.form === '6-K' ? '6-K' : 'Prelim.'}
+                    </span>
+                  )}
                 </td>
                 {COLS.map((col) => (
                   <td key={col.key} className="tw:px-3 tw:py-2.5 tw:text-right tw:whitespace-nowrap tw:tabular-nums tw:font-mono">

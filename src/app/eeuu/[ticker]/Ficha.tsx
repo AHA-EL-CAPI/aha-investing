@@ -5,6 +5,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Legend,
   Line,
   LineChart,
@@ -14,7 +15,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import type { SecValuation, SegmentAxis } from '@/lib/sec';
+import type { SecPreliminary, SecValuation, SegmentAxis } from '@/lib/sec';
 import { pct, quarterLabel, times, usd, usdPrice, usdShort } from '@/lib/secFormat';
 import { GLOSARIO } from '../terminos';
 import { useSeriesToggle } from '@/components/useSeriesToggle';
@@ -40,6 +41,7 @@ export type FichaData = {
   segments: SegmentAxis[];
   filingUrl: (string | null)[];
   filingForm: (string | null)[];
+  preliminary: SecPreliminary[];
 };
 
 const SEG_COLORS = ['var(--series-1)', 'var(--series-2)', 'var(--series-3)', 'var(--series-4)', '#e879f9', '#22d3ee', '#f87171', '#a3e635'];
@@ -120,6 +122,12 @@ export default function Ficha({ d }: { d: FichaData }) {
   const cur = d.currency === 'USD' ? 'US$' : `${d.currency} `;
   const money = (x: Num | undefined) => usd(x).replace('US$', cur);
   const hasPrice = d.currency === 'USD' && v.close != null;
+  // trimestres con cifras del comunicado de resultados (8-K) que aun no estan en el 10-Q / 10-K: se marcan con *
+  const pre = (i: number) => d.preliminary[i] ?? null;
+  const isPre = (i: number) => pre(i) !== null && pre(i)!.form !== '6-K';
+  const qLabel = (i: number) => `${quarterLabel(d.periods[i])}${isPre(i) ? '*' : ''}`;
+  const lastPre = pre(d.periods.length - 1);
+  const anyPre8 = d.periods.some((_, i) => isPre(i));
 
   // serie segun la vista: trimestre, 12 meses o ano fiscal (solo en los trimestres que cierran el ano)
   const pick = (key: string, which: View): Num[] => {
@@ -129,14 +137,15 @@ export default function Ficha({ d }: { d: FichaData }) {
   const idx = d.periods.map((_, i) => i).filter((i) => view !== 'fy' || d.isFy[i]);
   const revKey = 'revenue';
   const bars = idx.map((i) => ({
-    label: view === 'fy' ? d.fiscal[i].split(' ')[1] : quarterLabel(d.periods[i]),
+    label: view === 'fy' ? `${d.fiscal[i].split(' ')[1]}${isPre(i) ? '*' : ''}` : qLabel(i),
+    pre: isPre(i),
     Ingresos: pick(revKey, view)[i],
     Utilidad: pick('net_income', view)[i],
     FCF: d.isBank ? null : pick('fcf', view)[i],
   }));
 
   const margins = d.periods.map((p, i) => ({
-    label: quarterLabel(p),
+    label: qLabel(i),
     'Margen bruto': d.isBank ? null : d.ratios.gross_margin?.[i] ?? null,
     'Margen operacional': d.isBank ? null : d.ratios.operating_margin?.[i] ?? null,
     'Margen neto': d.ratios.net_margin?.[i] ?? null,
@@ -146,13 +155,13 @@ export default function Ficha({ d }: { d: FichaData }) {
     const roe = d.ratios.roe?.[i] ?? null;
     const roic = d.ratios.roic?.[i] ?? null;
     return {
-      label: quarterLabel(p),
+      label: qLabel(i),
       ROE: roe != null && Math.abs(roe) < 3 ? roe : null,
       ROIC: d.isBank || roic == null || Math.abs(roic) > 3 ? null : roic,
     };
   });
   const perShare = d.periods.map((p, i) => ({
-    label: quarterLabel(p),
+    label: qLabel(i),
     'EPS (12 meses)': d.ttm.eps?.[i] ?? null,
     'FCF por acción (12 meses)': d.isBank ? null : d.ttm.fcf_ps?.[i] ?? null,
   }));
@@ -246,6 +255,29 @@ export default function Ficha({ d }: { d: FichaData }) {
 
   return (
     <div className="tw:space-y-6">
+      {lastPre && (
+        <div className="tw:border tw:border-accent tw:bg-surface tw:rounded-xl tw:p-4 tw:text-sm tw:text-fg">
+          <span className="tw:font-semibold tw:text-accent">
+            {lastPre.form === '6-K' ? 'Cifras del informe de resultados (6-K)' : 'Resultados preliminares'}
+          </span>{' '}
+          {lastPre.form === '6-K' ? (
+            <>
+              del {d.fiscal.at(-1)}, radicado el {lastPre.filed}. Esta empresa es emisora extranjera: no radica 10-Q, así que
+              sus trimestres salen del 6-K (sin auditar) y las cifras anuales se confirman con el 20-F.
+            </>
+          ) : (
+            <>
+              del {d.fiscal.at(-1)}, tomados del comunicado de resultados (8-K) del {lastPre.filed}. Se reemplazan solos por las
+              cifras oficiales en cuanto la empresa radique el 10-Q / 10-K.
+            </>
+          )}{' '}
+          {lastPre.url && (
+            <a href={lastPre.url} target="_blank" rel="noopener noreferrer" className="tw:text-accent tw:hover:underline">
+              Ver comunicado ↗
+            </a>
+          )}
+        </div>
+      )}
       <div className="tw:grid tw:grid-cols-2 tw:md:grid-cols-3 tw:lg:grid-cols-6 tw:gap-4">
         <Tile label="Precio" value={hasPrice ? usdPrice(v.close) : '—'} note={v.date ? `Cierre ${v.date}` : undefined} />
         <Tile label="Cap. bursátil" value={hasPrice ? usd(v.market_cap) : '—'} term="market_cap" />
@@ -291,12 +323,27 @@ export default function Ficha({ d }: { d: FichaData }) {
             <YAxis tick={AXIS} tickFormatter={usdShort} width={60} />
             <Tooltip formatter={(val: number) => money(val)} {...TOOLTIP} />
             <Legend {...s1.legend} />
-            <Bar hide={s1.hidden('Ingresos')} dataKey="Ingresos" fill={BLUE} radius={[3, 3, 0, 0]} />
-            <Bar hide={s1.hidden('Utilidad')} dataKey="Utilidad" fill={GREEN} radius={[3, 3, 0, 0]} />
-            {!d.isBank && <Bar hide={s1.hidden('FCF')} dataKey="FCF" fill={AMBER} radius={[3, 3, 0, 0]} />}
+            <Bar hide={s1.hidden('Ingresos')} dataKey="Ingresos" fill={BLUE} radius={[3, 3, 0, 0]}>
+              {bars.map((b, k) => (
+                <Cell key={k} fillOpacity={b.pre ? 0.45 : 1} stroke={b.pre ? BLUE : undefined} strokeDasharray="3 2" />
+              ))}
+            </Bar>
+            <Bar hide={s1.hidden('Utilidad')} dataKey="Utilidad" fill={GREEN} radius={[3, 3, 0, 0]}>
+              {bars.map((b, k) => (
+                <Cell key={k} fillOpacity={b.pre ? 0.45 : 1} stroke={b.pre ? GREEN : undefined} strokeDasharray="3 2" />
+              ))}
+            </Bar>
+            {!d.isBank && <Bar hide={s1.hidden('FCF')} dataKey="FCF" fill={AMBER} radius={[3, 3, 0, 0]}>
+              {bars.map((b, k) => (
+                <Cell key={k} fillOpacity={b.pre ? 0.45 : 1} stroke={b.pre ? AMBER : undefined} strokeDasharray="3 2" />
+              ))}
+            </Bar>}
           </BarChart>
         </ResponsiveContainer>
-        <p className="tw:text-xs tw:text-muted">Miles de millones de {d.currency === 'USD' ? 'dólares' : d.currency}.</p>
+        <p className="tw:text-xs tw:text-muted">
+          Miles de millones de {d.currency === 'USD' ? 'dólares' : d.currency}.
+          {anyPre8 && ' * Preliminar: cifras del comunicado de resultados (8-K), barras más claras.'}
+        </p>
       </Card>
 
       {seg && (
@@ -432,7 +479,7 @@ export default function Ficha({ d }: { d: FichaData }) {
 
       <Card
         title="Cifras clave"
-        subtitle={`Miles de millones de ${d.currency === 'USD' ? 'dólares' : d.currency}; por acción en ${d.currency === 'USD' ? 'dólares' : d.currency}; acciones en miles de millones. Debajo de cada cifra, el crecimiento ${tableView === 'fy' ? 'frente al año anterior' : 'frente al mismo periodo del año anterior'}. Desliza a la izquierda para ver la historia. Haz clic en 10-Q / 10-K para abrir el informe original y verificar cada cifra.`}
+        subtitle={`Miles de millones de ${d.currency === 'USD' ? 'dólares' : d.currency}; por acción en ${d.currency === 'USD' ? 'dólares' : d.currency}; acciones en miles de millones. Debajo de cada cifra, el crecimiento ${tableView === 'fy' ? 'frente al año anterior' : 'frente al mismo periodo del año anterior'}. Desliza a la izquierda para ver la historia. Haz clic en 10-Q / 10-K para abrir el informe original y verificar cada cifra.${anyPre8 ? ' Las columnas «Preliminar» salen del comunicado de resultados (8-K) y se reemplazan por el 10-Q / 10-K cuando llega.' : ''}`}
       >
         <Toggle<View>
           value={tableView}
@@ -451,6 +498,11 @@ export default function Ficha({ d }: { d: FichaData }) {
                 {tIdx.map((i) => (
                   <th key={i} className="tw:px-3 tw:py-2 tw:text-right tw:whitespace-nowrap tw:font-mono tw:text-xs tw:font-medium tw:text-muted">
                     <div>{tableView === 'fy' ? d.fiscal[i].split(' ')[1] : d.fiscal[i]}</div>
+                    {isPre(i) && (
+                      <div className="tw:text-[10px] tw:font-sans tw:font-semibold tw:uppercase tw:text-accent" title={`Comunicado de resultados del ${pre(i)!.filed}; se reemplaza cuando llegue el 10-Q / 10-K`}>
+                        Preliminar
+                      </div>
+                    )}
                     {d.filingUrl[i] && (
                       <a
                         href={d.filingUrl[i]!}
@@ -473,7 +525,7 @@ export default function Ficha({ d }: { d: FichaData }) {
                   {tIdx.map((i, pos) => {
                     const g = r.kind === 'shares' ? null : growthRow(r.key, i, pos);
                     return (
-                      <td key={i} className="tw:px-3 tw:py-1.5 tw:text-right tw:whitespace-nowrap tw:tabular-nums tw:font-mono">
+                      <td key={i} className={`tw:px-3 tw:py-1.5 tw:text-right tw:whitespace-nowrap tw:tabular-nums tw:font-mono ${isPre(i) ? 'tw:italic tw:bg-surface-2' : ''}`}>
                         <div>{fmtCell(cell(r.key, i), r.kind)}</div>
                         {g !== null && (
                           <div className={`tw:text-xs ${g >= 0 ? 'tw:text-pos' : 'tw:text-neg'}`}>{pct(g, 0)}</div>

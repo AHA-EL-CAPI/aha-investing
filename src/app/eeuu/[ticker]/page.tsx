@@ -59,7 +59,9 @@ export default async function Page({ params }: Params) {
     })),
     filingUrl: sl(c.filing_url ?? c.periods.map(() => null)),
     filingForm: sl(c.filing_form ?? c.periods.map(() => null)),
+    preliminary: sl(c.preliminary ?? c.periods.map(() => null)),
   };
+  const lastPre = c.preliminary?.at(-1);
 
   return (
     <>
@@ -74,6 +76,11 @@ export default async function Page({ params }: Params) {
           {c.ticker}
           {c.tipo === 'banco' ? ' · Banco' : ''} · Último informe {fiscalLabel(summary.fiscal_year, summary.fiscal_quarter)} (cierre{' '}
           {summary.last_period})
+          {lastPre && (
+            <span className="tw:ml-2 tw:inline-block tw:px-2 tw:py-0.5 tw:rounded-full tw:text-xs tw:font-semibold tw:border tw:border-accent tw:text-accent">
+              {lastPre.form === '6-K' ? `6-K del ${lastPre.filed}` : `Preliminar · 8-K del ${lastPre.filed}`}
+            </span>
+          )}
           {DASHBOARDS.has(c.ticker) && (
             <>
               {' · '}
@@ -90,7 +97,8 @@ export default async function Page({ params }: Params) {
           <a href={c.sec_url} className="tw:text-accent tw:hover:underline" target="_blank" rel="noopener noreferrer">
             EDGAR (SEC)
           </a>
-          ; precios de Yahoo Finance.
+          ; los trimestres marcados como preliminares salen de las tablas del comunicado de resultados (8-K o 6-K) y
+          se reemplazan solos por las cifras del 10-Q / 10-K cuando la empresa lo radica; precios de Yahoo Finance.
           {c.currency !== 'USD' ? ` La empresa reporta en ${c.currency}, así que no se calculan múltiplos contra el precio en dólares.` : ''}{' '}
           Esto no es una recomendación de inversión.
         </p>
