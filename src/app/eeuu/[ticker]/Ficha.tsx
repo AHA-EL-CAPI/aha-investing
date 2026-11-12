@@ -42,6 +42,8 @@ export type FichaData = {
   filingUrl: (string | null)[];
   filingForm: (string | null)[];
   preliminary: SecPreliminary[];
+  calc: Record<string, (string | null)[]>;
+  calcFy: Record<string, (string | null)[]>;
 };
 
 const SEG_COLORS = ['var(--series-1)', 'var(--series-2)', 'var(--series-3)', 'var(--series-4)', '#e879f9', '#22d3ee', '#f87171', '#a3e635'];
@@ -222,6 +224,10 @@ export default function Ficha({ d }: { d: FichaData }) {
   useEffect(() => {
     if (tableRef.current) tableRef.current.scrollLeft = tableRef.current.scrollWidth;
   }, [tableView]);
+  // cifra calculada (no sale tal cual del XBRL): se marca con ≈ y el tooltip dice como se calculo
+  const calcOf = (key: string, i: number): string | null =>
+    tableView === 'quarter' ? d.calc[key]?.[i] ?? null : tableView === 'fy' ? d.calcFy[key]?.[i] ?? null : null;
+  const anyCalc = tIdx.some((i) => rows.some((r) => calcOf(r.key, i) && cell(r.key, i) != null));
   const fmtCell = (x: Num, kind: string) =>
     x === null ? '—' : kind === 'ps' ? usdPrice(x).replace('US$', '') : kind === 'shares' ? `${(x / 1e9).toLocaleString('es-CO', { maximumFractionDigits: 3 })}` : usdShort(x);
 
@@ -507,7 +513,7 @@ export default function Ficha({ d }: { d: FichaData }) {
 
       <Card
         title="Cifras clave"
-        subtitle={`Miles de millones de ${d.currency === 'USD' ? 'dólares' : d.currency}; por acción en ${d.currency === 'USD' ? 'dólares' : d.currency}; acciones en miles de millones. Debajo de cada cifra, el crecimiento ${tableView === 'fy' ? 'frente al año anterior' : 'frente al mismo periodo del año anterior'}. Desliza a la izquierda para ver la historia. Haz clic en 10-Q / 10-K para abrir el informe original y verificar cada cifra.${anyPre8 ? ' Las columnas «Preliminar» salen del comunicado de resultados (8-K) y se reemplazan por el 10-Q / 10-K cuando llega.' : ''}`}
+        subtitle={`Miles de millones de ${d.currency === 'USD' ? 'dólares' : d.currency}; por acción en ${d.currency === 'USD' ? 'dólares' : d.currency}; acciones en miles de millones. Debajo de cada cifra, el crecimiento ${tableView === 'fy' ? 'frente al año anterior' : 'frente al mismo periodo del año anterior'}. Desliza a la izquierda para ver la historia. Haz clic en 10-Q / 10-K para abrir el informe original y verificar cada cifra.${anyCalc ? ' ≈ = cifra calculada a partir del XBRL (pasa el mouse para ver cómo).' : ''}${anyPre8 ? ' Las columnas «Preliminar» salen del comunicado de resultados (8-K) y se reemplazan por el 10-Q / 10-K cuando llega.' : ''}`}
       >
         <Toggle<View>
           value={tableView}
@@ -554,7 +560,12 @@ export default function Ficha({ d }: { d: FichaData }) {
                     const g = r.kind === 'shares' ? null : growthRow(r.key, i, pos);
                     return (
                       <td key={i} className={`tw:px-3 tw:py-1.5 tw:text-right tw:whitespace-nowrap tw:tabular-nums tw:font-mono ${isPre(i) ? 'tw:italic tw:bg-surface-2' : ''}`}>
-                        <div>{fmtCell(cell(r.key, i), r.kind)}</div>
+                        <div>
+                          {fmtCell(cell(r.key, i), r.kind)}
+                          {calcOf(r.key, i) && cell(r.key, i) != null && (
+                            <sup className="tw:ml-0.5 tw:text-accent tw:cursor-help" title={`Calculado: ${calcOf(r.key, i)}`}>≈</sup>
+                          )}
+                        </div>
                         {g !== null && (
                           <div className={`tw:text-xs ${g >= 0 ? 'tw:text-pos' : 'tw:text-neg'}`}>{pct(g, 0)}</div>
                         )}
