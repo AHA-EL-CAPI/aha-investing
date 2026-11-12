@@ -63,6 +63,8 @@ export default async function Page({ params }: Params) {
     filingUrl: sl(c.filing_url ?? c.periods.map(() => null)),
     filingForm: sl(c.filing_form ?? c.periods.map(() => null)),
     preliminary: sl(c.preliminary ?? c.periods.map(() => null)),
+    calc: Object.fromEntries(Object.entries(c.calc ?? {}).map(([k, v]) => [k, sl(v)])),
+    calcFy: Object.fromEntries(Object.entries(c.calc_fy ?? {}).map(([k, v]) => [k, sl(v)])),
   };
   const lastPre = c.preliminary?.at(-1);
 

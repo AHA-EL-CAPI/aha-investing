@@ -66,6 +66,9 @@ export type SecCompany = {
   filing_url?: (string | null)[];
   filing_form?: (string | null)[];
   preliminary?: SecPreliminary[];
+  // cifras que no salen tal cual del XBRL: por serie, como se calculo cada periodo (null = cifra oficial)
+  calc?: Record<string, (string | null)[]>;
+  calc_fy?: Record<string, (string | null)[]>;
 };
 
 // Ingresos por segmento / producto / pais (cifras con dimension del XBRL de cada informe), alineados con periods.
