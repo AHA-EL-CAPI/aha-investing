@@ -32,7 +32,13 @@ export type SecSummary = {
   fiscal_quarter: number;
   metrics: Record<string, Num>;
   valuation: SecValuation;
+  // ultimo trimestre con cifras del comunicado de resultados (8-K / 6-K) que aun no estan en un 10-Q / 10-K
+  preliminary?: { form: string; filed: string | null } | null;
 };
+
+// Trimestre con cifras que todavia salen del comunicado de resultados (8-K item 2.02, o 6-K de emisores extranjeros).
+// Se reemplazan solas por las del 10-Q / 10-K en la siguiente actualizacion despues de que la empresa lo radique.
+export type SecPreliminary = { form: string; filed: string | null; url: string | null; items: string[] } | null;
 
 type Dcf = { growth: [number, number, number]; multiple: number; discount: number; safety: number };
 
@@ -59,6 +65,7 @@ export type SecCompany = {
   segments?: SegmentAxis[];
   filing_url?: (string | null)[];
   filing_form?: (string | null)[];
+  preliminary?: SecPreliminary[];
 };
 
 // Ingresos por segmento / producto / pais (cifras con dimension del XBRL de cada informe), alineados con periods.
