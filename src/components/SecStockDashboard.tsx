@@ -1,10 +1,13 @@
 import Link from 'next/link';
 
 import { StockDashboard } from '@/components/StockDashboard';
-import { secDashboard } from '@/lib/sec';
+import { loadSecCompany, secDashboard } from '@/lib/sec';
 
 // Dashboards de /dashboard/[TICKER] de empresas de EE. UU., alimentados por el pipeline sec-fundamentales
 export function SecStockDashboard({ ticker, name }: { ticker: string; name: string }) {
+  if (!loadSecCompany(ticker)) {
+    return <p className="tw:p-8 tw:text-muted">Los datos de {name} no están disponibles en este momento.</p>;
+  }
   const { stockData, priceHistory, valuationTable, isBank, company } = secDashboard(ticker);
   const last = stockData.at(-1);
   const metrics = isBank

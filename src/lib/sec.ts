@@ -27,6 +27,12 @@ export type SecSummary = {
   name: string;
   currency: string;
   tipo: 'general' | 'banco';
+  // lista propia de Alejandro (siempre se publica) y/o S&P 500; sector y subindustria GICS; plantilla por industria
+  propia?: boolean;
+  sp500?: boolean;
+  sector?: string | null;
+  industria?: string | null;
+  plantilla?: 'general' | 'banco' | 'aseguradora' | 'reit' | 'utility';
   last_period: string;
   fiscal_year: number;
   fiscal_quarter: number;
@@ -47,6 +53,12 @@ export type SecCompany = {
   name: string;
   currency: string;
   tipo: 'general' | 'banco';
+  // lista propia de Alejandro (siempre se publica) y/o S&P 500; sector y subindustria GICS; plantilla por industria
+  propia?: boolean;
+  sp500?: boolean;
+  sector?: string | null;
+  industria?: string | null;
+  plantilla?: 'general' | 'banco' | 'aseguradora' | 'reit' | 'utility';
   generated: string;
   cik: number;
   sec_url: string;
@@ -92,6 +104,8 @@ function readJson<T>(file: string): T {
 }
 
 export function loadSecIndex(): { generated: string; companies: SecSummary[] } {
+  // sin datos (scripts/datos-sec.mjs no pudo bajarlos): la pagina dice que no hay datos en vez de romper el build
+  if (!fs.existsSync(path.join(DIR, 'index.json'))) return { generated: '', companies: [] };
   return readJson('index.json');
 }
 
