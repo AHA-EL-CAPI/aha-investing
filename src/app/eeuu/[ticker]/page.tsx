@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { SiteHeader } from '@/components/SiteHeader';
 import { loadSecCompany, loadSecIndex, secTickers } from '@/lib/sec';
-import { fiscalLabel } from '@/lib/secFormat';
+import { fiscalLabel, PLANTILLA, SECTOR } from '@/lib/secFormat';
 import Glosario from '../Glosario';
 import Ficha, { type FichaData } from './Ficha';
 
@@ -80,7 +80,9 @@ export default async function Page({ params }: Params) {
         <h1 className="tw:text-3xl tw:sm:text-4xl tw:font-extrabold tw:tracking-tight tw:font-display tw:mt-2 tw:text-fg">{c.name}</h1>
         <p className="tw:text-muted tw:mb-6">
           {c.ticker}
-          {c.tipo === 'banco' ? ' · Banco' : ''} · Último informe {fiscalLabel(summary.fiscal_year, summary.fiscal_quarter)} (cierre{' '}
+          {c.plantilla && PLANTILLA[c.plantilla] ? ` · ${PLANTILLA[c.plantilla]}` : c.tipo === 'banco' ? ' · Banco' : ''}
+          {c.sector ? ` · ${SECTOR[c.sector] ?? c.sector}` : ''}
+          {c.sp500 ? ' · S&P 500' : ''} · Último informe {fiscalLabel(summary.fiscal_year, summary.fiscal_quarter)} (cierre{' '}
           {summary.last_period})
           {lastPre && (
             <span className="tw:ml-2 tw:inline-block tw:px-2 tw:py-0.5 tw:rounded-full tw:text-xs tw:font-semibold tw:border tw:border-accent tw:text-accent">

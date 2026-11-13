@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# datos de /eeuu: se bajan en el build del repo de datos (scripts/datos-sec.mjs); solo se versiona el puntero
+/src/data/sec/*.json
+!/src/data/sec/fuente.json
+/src/data/sec/.sha

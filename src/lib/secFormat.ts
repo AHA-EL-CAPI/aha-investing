@@ -39,3 +39,24 @@ export function quarterLabel(p: string): string {
 
 // trimestre fiscal: T4 AF26
 export const fiscalLabel = (fy: number, fq: number) => `T${fq} AF${String(fy).slice(2)}`;
+
+// sector GICS en espanol y nombre de la plantilla por industria (lo que se muestra junto al ticker)
+export const SECTOR: Record<string, string> = {
+  'Information Technology': 'Tecnología',
+  'Health Care': 'Salud',
+  Financials: 'Financiero',
+  'Consumer Discretionary': 'Consumo discrecional',
+  'Communication Services': 'Comunicaciones',
+  Industrials: 'Industria',
+  'Consumer Staples': 'Consumo básico',
+  Energy: 'Energía',
+  Utilities: 'Servicios públicos',
+  'Real Estate': 'Inmobiliario',
+  Materials: 'Materiales',
+};
+export const PLANTILLA: Record<string, string> = {
+  banco: 'Banco',
+  aseguradora: 'Aseguradora',
+  reit: 'REIT',
+  utility: 'Servicios públicos',
+};

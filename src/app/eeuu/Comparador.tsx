@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { SecSummary } from '@/lib/sec';
-import { fiscalLabel, pct, times, usd, usdPrice } from '@/lib/secFormat';
+import { fiscalLabel, pct, PLANTILLA, SECTOR, times, usd, usdPrice } from '@/lib/secFormat';
 import { GLOSARIO } from './terminos';
 
 type Col = {
@@ -40,20 +40,32 @@ const COLS: Col[] = [
 
 const GROUPS = [
   ['todas', 'Todas'],
+  ['propia', 'Lista propia'],
+  ['sp500', 'S&P 500'],
   ['general', 'Empresas'],
   ['banco', 'Bancos'],
 ] as const;
 
+const enGrupo = (c: SecSummary, g: string) =>
+  g === 'todas' || (g === 'propia' ? !!c.propia : g === 'sp500' ? !!c.sp500 : c.tipo === g);
+
 export default function Comparador({ companies }: { companies: SecSummary[] }) {
   const [group, setGroup] = useState<string>('todas');
+  const [sector, setSector] = useState('');
   const [query, setQuery] = useState('');
+  const sectores = useMemo(
+    () => [...new Set(companies.map((c) => c.sector).filter((s): s is string => !!s))].sort((a, b) =>
+      (SECTOR[a] ?? a).localeCompare(SECTOR[b] ?? b, 'es')),
+    [companies],
+  );
   const [sort, setSort] = useState<{ key: string; desc: boolean }>({ key: 'market_cap', desc: true });
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
     const list = companies.filter(
       (c) =>
-        (group === 'todas' || c.tipo === group) &&
+        enGrupo(c, group) &&
+        (!sector || c.sector === sector) &&
         (!q || c.ticker.toLowerCase().includes(q) || c.name.toLowerCase().includes(q)),
     );
     const col = COLS.find((c) => c.key === sort.key);
@@ -65,7 +77,7 @@ export default function Comparador({ companies }: { companies: SecSummary[] }) {
       if (vb == null) return -1;
       return sort.desc ? vb - va : va - vb;
     });
-  }, [companies, group, query, sort]);
+  }, [companies, group, sector, query, sort]);
 
   const toggle = (key: string) =>
     setSort((s) => (s.key === key ? { key, desc: !s.desc } : { key, desc: key !== 'name' }));
@@ -86,6 +98,22 @@ export default function Comparador({ companies }: { companies: SecSummary[] }) {
             {label}
           </button>
         ))}
+        {sectores.length > 0 && (
+          <select
+            value={sector}
+            onChange={(e) => setSector(e.target.value)}
+            aria-label="Sector"
+            className="tw:px-3 tw:py-1.5 tw:rounded-lg tw:border tw:border-line tw:bg-surface tw:text-sm tw:text-fg"
+          >
+            <option value="">Todos los sectores</option>
+            {sectores.map((s) => (
+              <option key={s} value={s}>
+                {SECTOR[s] ?? s}
+              </option>
+            ))}
+          </select>
+        )}
+        <span className="tw:text-xs tw:text-muted">{rows.length} empresas</span>
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -125,7 +153,8 @@ export default function Comparador({ companies }: { companies: SecSummary[] }) {
                   </Link>
                   <div className="tw:text-xs tw:text-muted">
                     {c.ticker}
-                    {c.tipo === 'banco' ? ' · Banco' : ''}
+                    {c.plantilla && PLANTILLA[c.plantilla] ? ` · ${PLANTILLA[c.plantilla]}` : c.tipo === 'banco' ? ' · Banco' : c.sector ? ` · ${SECTOR[c.sector] ?? c.sector}` : ''}
+                    {c.propia ? ' · Lista propia' : ''}
                   </div>
                 </td>
                 <td className="tw:px-3 tw:py-2.5 tw:whitespace-nowrap tw:font-mono tw:text-muted">
