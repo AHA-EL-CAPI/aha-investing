@@ -66,6 +66,10 @@ export type SecCompany = {
   filing_url?: (string | null)[];
   filing_form?: (string | null)[];
   preliminary?: SecPreliminary[];
+  // Emisores extranjeros (NU, BABA): trimestres que salen del 6-K de un ano cuyo 20-F ya esta radicado. Son la cifra
+  // definitiva del trimestre (no radican 10-Q y el 20-F solo trae el ano), asi que no son preliminares: no traen XBRL
+  // trimestral. Mismo formato que preliminary (null = el trimestre no sale de un 6-K definitivo).
+  report_6k?: SecPreliminary[];
   // cifras que no salen tal cual del XBRL: por serie, como se calculo cada periodo (null = cifra oficial)
   calc?: Record<string, (string | null)[]>;
   calc_fy?: Record<string, (string | null)[]>;

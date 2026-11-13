@@ -42,6 +42,7 @@ export type FichaData = {
   filingUrl: (string | null)[];
   filingForm: (string | null)[];
   preliminary: SecPreliminary[];
+  report6k: SecPreliminary[];
   calc: Record<string, (string | null)[]>;
   calcFy: Record<string, (string | null)[]>;
 };
@@ -130,6 +131,21 @@ export default function Ficha({ d }: { d: FichaData }) {
   const qLabel = (i: number) => `${quarterLabel(d.periods[i])}${isPre(i) ? '*' : ''}`;
   const lastPre = pre(d.periods.length - 1);
   const anyPre8 = d.periods.some((_, i) => isPre(i));
+  // texto del enlace al informe de cada trimestre: los 6-K de emisores extranjeros no traen XBRL trimestral
+  const filingTitle = (i: number) => {
+    const r6 = d.report6k[i];
+    if (r6 && d.filingForm[i] !== r6.form) {
+      // cierre del ano: el enlace abre el 20-F, pero el trimestre sale del 6-K
+      return `Abre el ${d.filingForm[i] ?? 'informe anual'} (trae el año). Las cifras de este trimestre salen del comunicado trimestral 6-K del ${r6.filed ?? ''}: la empresa es emisora extranjera y no radica 10-Q, así que el trimestre no trae XBRL`;
+    }
+    if (r6) {
+      return `Comunicado trimestral 6-K del ${r6.filed ?? ''}: la empresa es emisora extranjera y no radica 10-Q, así que este trimestre no trae XBRL; el año sale del 20-F, que ya está radicado`;
+    }
+    if (pre(i)?.form === '6-K') {
+      return `Comunicado trimestral 6-K del ${pre(i)!.filed ?? ''}, sin XBRL trimestral; la cifra anual se confirma con el 20-F`;
+    }
+    return 'Abre el informe original en el visor de la SEC';
+  };
 
   // serie segun la vista: trimestre, 12 meses o ano fiscal (solo en los trimestres que cierran el ano)
   const pick = (key: string, which: View): Num[] => {
@@ -543,7 +559,7 @@ export default function Ficha({ d }: { d: FichaData }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="tw:text-accent tw:normal-case tw:hover:underline"
-                        title="Abre el informe original en el visor de la SEC"
+                        title={filingTitle(i)}
                       >
                         {d.filingForm[i] ?? 'informe'} ↗
                       </a>

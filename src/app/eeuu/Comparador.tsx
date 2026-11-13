@@ -133,7 +133,11 @@ export default function Comparador({ companies }: { companies: SecSummary[] }) {
                   {c.preliminary && (
                     <span
                       className="tw:ml-1.5 tw:px-1.5 tw:py-0.5 tw:rounded tw:text-[10px] tw:font-sans tw:font-semibold tw:border tw:border-accent tw:text-accent"
-                      title={`Cifras del comunicado de resultados (${c.preliminary.form} del ${c.preliminary.filed}); se reemplazan solas cuando llegue el informe oficial`}
+                      title={
+                        c.preliminary.form === '6-K'
+                          ? `Cifras del comunicado trimestral 6-K del ${c.preliminary.filed} (emisora extranjera: no radica 10-Q); la cifra anual se confirma con el 20-F`
+                          : `Cifras del comunicado de resultados (${c.preliminary.form} del ${c.preliminary.filed}); se reemplazan solas cuando llegue el informe oficial`
+                      }
                     >
                       {c.preliminary.form === '6-K' ? '6-K' : 'Prelim.'}
                     </span>
